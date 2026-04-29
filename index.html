@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lash Cataleya — Reserva tu cita</title>
+
+  <!-- Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==================== VARIABLES ==================== */
+    :root {
+      --glaucous:    #59789F;
+      --powder:      #A9B6C4;
+      --vanilla:     #ECE69D;
+      --moss:        #7A9445;
+      --dark:        #243C2C;
+      --bg:          #F5F6F0;
+      --surface:     #FFFFFF;
+      --surface-var: #EEF2E8;
+      --divider:     #D4DDD0;
+      --text:        #243C2C;
+      --text-sec:    #4A6350;
+      --text-muted:  #8A9E8E;
+      --error:       #B85C5C;
+      --success:     #7A9445;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ==================== HEADER ==================== */
+    header {
+      background: linear-gradient(135deg, var(--dark), var(--moss));
+      padding: 32px 20px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -20%;
+      width: 140%;
+      height: 200%;
+      background: radial-gradient(ellipse, rgba(255,255,255,0.04) 0%, transparent 70%);
+    }
+
+    .header-logo {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 700;
+      color: white;
+    }
+
+    header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 700;
+      color: white; letter-spacing: 0.5px;
+    }
+
+    header p {
+      font-size: 13px; color: rgba(255,255,255,0.7);
+      margin-top: 4px;
+    }
+
+    /* ==================== CONTENEDOR ==================== */
+    .container {
+      max-width: 480px;
+      margin: -20px auto 0;
+      padding: 0 16px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ==================== CARD ==================== */
+    .card {
+      background: var(--surface);
+      border-radius: 20px;
+      border: 1px solid var(--divider);
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(36,60,44,0.06);
+    }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .card-subtitle {
+      font-size: 12px; color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* ==================== PASOS ==================== */
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .step {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .step-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      background: var(--surface-var);
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .step.active .step-num {
+      background: var(--moss);
+      color: white;
+    }
+
+    .step.done .step-num {
+      background: var(--glaucous);
+      color: white;
+    }
+
+    .step-line {
+      width: 20px; height: 2px;
+      background: var(--divider);
+      border-radius: 1px;
+    }
+
+    /* ==================== FORMULARIO ==================== */
+    .form-group { margin-bottom: 14px; }
+
+    label {
+      display: block;
+      font-size: 11px; font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: none;
+      background: var(--surface-var);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px; color: var(--text);
+      outline: none;
+      transition: box-shadow 0.2s;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      box-shadow: 0 0 0 2px var(--moss);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* ==================== SERVICIOS GRID ==================== */
+    .servicios-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .servicio-card {
+      border: 2px solid var(--divider);
+      border-radius: 14px;
+      padding: 14px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--surface);
+    }
+
+    .servicio-card:hover {
+      border-color: var(--moss);
+      background: var(--surface-var);
+    }
+
+    .servicio-card.selected {
+      border-color: var(--moss);
+      background: rgba(122, 148, 69, 0.08);
+    }
+
+    .servicio-nombre {
+      font-size: 13px; font-weight: 700;
+      color: var(--text); margin-bottom: 4px;
+    }
+
+    .servicio-cat {
+      font-size: 10px; font-weight: 600;
+      color: var(--glaucous);
+      text-transform: uppercase; letter-spacing: 0.3px;
+    }
+
+    .servicio-precio {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 700;
+      color: var(--dark); margin-top: 8px;
+    }
+
+    .servicio-dur {
+      font-size: 10px; color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ==================== CALENDARIO ==================== */
+    .calendar-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .cal-nav {
+      width: 36px; height: 36px;
+      border-radius: 50%; border: none;
+      background: var(--surface-var);
+      cursor: pointer; font-size: 16px;
+      color: var(--text); display: flex;
+      align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .cal-nav:hover { background: var(--divider); }
+
+    .cal-month {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 600;
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .cal-day-name {
+      text-align: center;
+      font-size: 10px; font-weight: 700;
+      color: var(--text-muted);
+      padding: 4px 0; text-transform: uppercase;
+    }
+
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text);
+    }
+
+    .cal-day:hover:not(.disabled):not(.empty) {
+      background: var(--surface-var);
+    }
+
+    .cal-day.selected {
+      background: var(--moss) !important;
+      color: white !important;
+      font-weight: 700;
+    }
+
+    .cal-day.today {
+      color: var(--moss);
+      font-weight: 700;
+    }
+
+    .cal-day.disabled {
+      color: var(--divider);
+      cursor: not-allowed;
+    }
+
+    .cal-day.empty { cursor: default; }
+
+    /* ==================== SLOTS ==================== */
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .slot {
+      padding: 10px 6px;
+      border-radius: 10px;
+      border: 2px solid var(--divider);
+      text-align: center;
+      cursor: pointer;
+      font-size: 13px; font-weight: 600;
+      transition: all 0.15s;
+      background: var(--surface);
+    }
+
+    .slot:hover { border-color: var(--moss); background: var(--surface-var); }
+    .slot.selected { border-color: var(--moss); background: rgba(122,148,69,0.1); color: var(--moss); }
+    .slot.ocupado { background: var(--surface-var); color: var(--text-muted); cursor: not-allowed; text-decoration: line-through; }
+
+    /* ==================== BOTÓN ==================== */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 4px;
+    }
+
+    .btn-primary {
+      background: var(--moss);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--dark); }
+    .btn-primary:disabled { background: var(--divider); color: var(--text-muted); cursor: not-allowed; }
+
+    .btn-secondary {
+      background: var(--surface-var);
+      color: var(--text-sec);
+      margin-top: 8px;
+    }
+
+    .btn-secondary:hover { background: var(--divider); }
+
+    /* ==================== RESUMEN CITA ==================== */
+    .resumen-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .resumen-item:last-child { border-bottom: none; }
+
+    .resumen-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: rgba(122,148,69,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+
+    .resumen-label {
+      font-size: 10px; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px;
+    }
+
+    .resumen-val {
+      font-size: 14px; font-weight: 600; color: var(--text);
+    }
+
+    /* ==================== ÉXITO ==================== */
+    .success-icon {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: rgba(122,148,69,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 20px;
+    }
+
+    .success-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px; font-weight: 700;
+      text-align: center; color: var(--dark);
+      margin-bottom: 8px;
+    }
+
+    .success-text {
+      font-size: 13px; color: var(--text-muted);
+      text-align: center; line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    /* ==================== LOADING / SPINNER ==================== */
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-slots {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* ==================== ALERTA ==================== */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 12px; font-weight: 600;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .alert-error { background: rgba(184,92,92,0.1); color: var(--error); border: 1px solid rgba(184,92,92,0.2); }
+    .alert-info  { background: rgba(89,120,159,0.1); color: var(--glaucous); border: 1px solid rgba(89,120,159,0.2); }
+
+    /* ==================== PANTALLAS ==================== */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ==================== FOOTER ==================== */
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 24px 0 0;
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 380px) {
+      .servicios-grid { grid-template-columns: 1fr; }
+      .slots-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-logo">LC</div>
+  <h1>Lash Cataleya</h1>
+  <p>Reserva tu cita en línea</p>
+</header>
+
+<div class="container">
+
+  <!-- ===================== PASO 1: DATOS DEL CLIENTE ===================== -->
+  <div class="screen active" id="screen-cliente">
+    <div class="card">
+      <div class="steps">
+        <div class="step active" id="step1"><div class="step-num">1</div><span>Tus datos</span></div>
+        <div class="step-line"></div>
+        <div class="step" id="step2"><div class="step-num">2</div><span>Servicio</span></div>
+        <div class="step-line"></div>
+        <div class="step" id="step3"><div class="step-num">3</div><span>Fecha</span></div>
+        <div class="step-line"></div>
+        <div class="step" id="step4"><div class="step-num">4</div><span>Confirmar</span></div>
+      </div>
+
+      <p class="card-title">¡Hola! ¿Quién eres?</p>
+      <p class="card-subtitle">Ingresá tu número para identificarte</p>
+
+      <div id="alert-cliente" class="alert alert-error"></div>
+
+      <div class="form-group">
+        <label>Nombre completo</label>
+        <input type="text" id="input-nombre" placeholder="Tu nombre" autocomplete="name">
+      </div>
+
+      <div class="form-group">
+        <label>WhatsApp</label>
+        <input type="tel" id="input-telefono" placeholder="+57 300 000 0000" autocomplete="tel">
+      </div>
+
+      <div class="form-group">
+        <label>Email (opcional)</label>
+        <input type="email" id="input-email" placeholder="tu@email.com" autocomplete="email">
+      </div>
+
+      <button class="btn btn-primary" onclick="irAServicios()">
+        Continuar →
+      </button>
+    </div>
+
+    <div class="footer">
+      Tus datos están protegidos y solo serán usados para gestionar tu cita. <br>
+      © Chio 2026
+    </div>
+  </div>
+
+  <!-- ===================== PASO 2: SERVICIO ===================== -->
+  <div class="screen" id="screen-servicio">
+    <div class="card">
+      <div class="steps">
+        <div class="step done" id="step1b"><div class="step-num">✓</div></div>
+        <div class="step-line"></div>
+        <div class="step active"><div class="step-num">2</div><span>Servicio</span></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">3</div></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">4</div></div>
+      </div>
+
+      <p class="card-title">¿Qué servicio querés?</p>
+      <p class="card-subtitle">Seleccioná un servicio para continuar</p>
+
+      <div id="alert-servicio" class="alert alert-error"></div>
+      <div id="servicios-container" class="servicios-grid">
+        <div class="loading-slots">Cargando servicios...</div>
+      </div>
+
+      <button class="btn btn-primary" style="margin-top: 20px" onclick="irAFecha()">
+        Continuar →
+      </button>
+      <button class="btn btn-secondary" onclick="irA('screen-cliente')">← Volver</button>
+    </div>
+  </div>
+
+  <!-- ===================== PASO 3: FECHA Y HORA ===================== -->
+  <div class="screen" id="screen-fecha">
+    <div class="card">
+      <div class="steps">
+        <div class="step done"><div class="step-num">✓</div></div>
+        <div class="step-line"></div>
+        <div class="step done"><div class="step-num">✓</div></div>
+        <div class="step-line"></div>
+        <div class="step active"><div class="step-num">3</div><span>Fecha</span></div>
+        <div class="step-line"></div>
+        <div class="step"><div class="step-num">4</div></div>
+      </div>
+
+      <p class="card-title">¿Cuándo venís?</p>
+      <p class="card-subtitle">Elegí el día y horario que mejor te quede</p>
+
+      <div id="alert-fecha" class="alert alert-error"></div>
+
+      <!-- CALENDARIO -->
+      <div class="calendar-header">
+        <button class="cal-nav" onclick="cambiarMes(-1)">&#8249;</button>
+        <span class="cal-month" id="cal-mes-label"></span>
+        <button class="cal-nav" onclick="cambiarMes(1)">&#8250;</button>
+      </div>
+
+      <div class="cal-grid" id="cal-grid"></div>
+
+      <!-- SLOTS -->
+      <div id="slots-container">
+        <div class="loading-slots" style="display:none" id="slots-loading">
+          Buscando horarios disponibles...
+        </div>
+        <div class="slots-grid" id="slots-grid"></div>
+      </div>
+
+      <button class="btn btn-primary" style="margin-top: 20px" onclick="irAConfirmar()">
+        Continuar →
+      </button>
+      <button class="btn btn-secondary" onclick="irA('screen-servicio')">← Volver</button>
+    </div>
+  </div>
+
+  <!-- ===================== PASO 4: CONFIRMAR ===================== -->
+  <div class="screen" id="screen-confirmar">
+    <div class="card">
+      <div class="steps">
+        <div class="step done"><div class="step-num">✓</div></div>
+        <div class="step-line"></div>
+        <div class="step done"><div class="step-num">✓</div></div>
+        <div class="step-line"></div>
+        <div class="step done"><div class="step-num">✓</div></div>
+        <div class="step-line"></div>
+        <div class="step active"><div class="step-num">4</div><span>Confirmar</span></div>
+      </div>
+
+      <p class="card-title">Resumen de tu cita</p>
+      <p class="card-subtitle">Revisá los datos antes de confirmar</p>
+
+      <div id="alert-confirmar" class="alert alert-error"></div>
+
+      <div id="resumen-container"></div>
+
+      <div class="form-group" style="margin-top: 16px">
+        <label>Notas adicionales (opcional)</label>
+        <textarea id="input-notas" rows="3" placeholder="Alergias, preferencias, etc..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" id="btn-confirmar" onclick="confirmarCita()">
+        Confirmar cita
+      </button>
+      <button class="btn btn-secondary" onclick="irA('screen-fecha')">← Volver</button>
+    </div>
+  </div>
+
+  <!-- ===================== ÉXITO ===================== -->
+  <div class="screen" id="screen-exito">
+    <div class="card" style="text-align: center; padding: 40px 24px">
+      <div class="success-icon">🌿</div>
+      <p class="success-title">¡Cita agendada!</p>
+      <p class="success-text" id="exito-texto"></p>
+
+      <div id="resumen-exito" style="text-align: left; margin-bottom: 24px"></div>
+
+      <a id="btn-whatsapp" href="#" target="_blank"
+         style="display:block; background: #25D366; color: white; padding: 14px;
+                border-radius: 12px; text-decoration: none; font-weight: 700;
+                font-size: 14px; margin-bottom: 10px;">
+        💬 Abrir confirmación en WhatsApp
+      </a>
+
+      <button class="btn btn-secondary" onclick="nuevaReserva()">
+        Hacer otra reserva
+      </button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ================================================
+// CONFIGURACIÓN — Reemplazá con tus datos de Supabase
+// ================================================
+const SUPABASE_URL  = 'https://bjuirffjfxkgcdmsynvm.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_SciQnIiX6CZdS9mXJgzu-Q_FVOZKgi_';
+const WHATSAPP_NEGOCIO = '+57300000000'; // número WhatsApp del negocio
+
+// ================================================
+// INIT SUPABASE
+// ================================================
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ================================================
+// ESTADO GLOBAL
+// ================================================
+const state = {
+  nombre: '', telefono: '', email: '',
+  clienteId: null,
+  servicio: null,      // objeto completo del servicio
+  fecha: null,         // Date
+  slot: null,          // string 'HH:MM'
+  notas: '',
+};
+
+let calMes = new Date().getMonth();
+let calAnio = new Date().getFullYear();
+
+// ================================================
+// NAVEGACIÓN
+// ================================================
+function irA(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showAlert(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+// ================================================
+// PASO 1 → PASO 2: DATOS DEL CLIENTE
+// ================================================
+async function irAServicios() {
+  const nombre   = document.getElementById('input-nombre').value.trim();
+  const telefono = document.getElementById('input-telefono').value.trim();
+  const email    = document.getElementById('input-email').value.trim();
+
+  if (!nombre) return showAlert('alert-cliente', 'Por favor ingresá tu nombre.');
+  if (!telefono) return showAlert('alert-cliente', 'Por favor ingresá tu WhatsApp.');
+
+  state.nombre = nombre;
+  state.telefono = telefono;
+  state.email = email;
+
+  // Buscar o crear cliente en Supabase
+  try {
+    const { data: existente } = await sb
+      .from('clientes')
+      .select('id, nombre')
+      .eq('telefono', telefono)
+      .maybeSingle();
+
+    if (existente) {
+      state.clienteId = existente.id;
+    } else {
+      const { data: nuevo, error } = await sb
+        .from('clientes')
+        .insert({ nombre, telefono, email: email || null })
+        .select('id')
+        .single();
+      if (error) throw error;
+      state.clienteId = nuevo.id;
+    }
+  } catch (e) {
+    console.error(e);
+    showAlert('alert-cliente', 'Error de conexión. Intentá de nuevo.');
+    return;
+  }
+
+  await cargarServicios();
+  irA('screen-servicio');
+}
+
+// ================================================
+// PASO 2: CARGAR SERVICIOS DESDE SUPABASE
+// ================================================
+async function cargarServicios() {
+  const container = document.getElementById('servicios-container');
+  container.innerHTML = '<div class="loading-slots">Cargando servicios...</div>';
+
+  const { data, error } = await sb
+    .from('servicios')
+    .select()
+    .eq('activo', true)
+    .order('orden');
+
+  if (error || !data?.length) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:13px">No hay servicios disponibles en este momento.</p>';
+    return;
+  }
+
+  container.innerHTML = data.map(s => `
+    <div class="servicio-card" id="srv-${s.id}" onclick="seleccionarServicio('${s.id}')">
+      <div class="servicio-cat">${s.categoria}</div>
+      <div class="servicio-nombre">${s.nombre}</div>
+      <div class="servicio-precio">$${Number(s.precio).toLocaleString('es')}</div>
+      <div class="servicio-dur">⏱ ${s.duracion_minutos} min</div>
+    </div>
+  `).join('');
+
+  // Guardar servicios en memoria para lookup rápido
+  window._servicios = data;
+}
+
+function seleccionarServicio(id) {
+  document.querySelectorAll('.servicio-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('srv-' + id).classList.add('selected');
+  state.servicio = window._servicios.find(s => s.id === id);
+}
+
+function irAFecha() {
+  if (!state.servicio) return showAlert('alert-servicio', 'Seleccioná un servicio para continuar.');
+  renderCalendario();
+  irA('screen-fecha');
+}
+
+// ================================================
+// PASO 3: CALENDARIO
+// ================================================
+const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+               'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function renderCalendario() {
+  document.getElementById('cal-mes-label').textContent = `${MESES[calMes]} ${calAnio}`;
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = DIAS.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  const primero = new Date(calAnio, calMes, 1);
+  const ultimoDia = new Date(calAnio, calMes + 1, 0).getDate();
+  const inicioSemana = primero.getDay();
+
+  // Celdas vacías al inicio
+  for (let i = 0; i < inicioSemana; i++) {
+    grid.innerHTML += '<div class="cal-day empty"></div>';
+  }
+
+  for (let d = 1; d <= ultimoDia; d++) {
+    const fecha = new Date(calAnio, calMes, d);
+    const esPasado = fecha < hoy;
+    const esDomingo = fecha.getDay() === 0;
+    const esHoy = fecha.toDateString() === hoy.toDateString();
+    const esSeleccionado = state.fecha?.toDateString() === fecha.toDateString();
+
+    const clases = ['cal-day',
+      esPasado || esDomingo ? 'disabled' : '',
+      esHoy ? 'today' : '',
+      esSeleccionado ? 'selected' : '',
+    ].filter(Boolean).join(' ');
+
+    const onclick = (!esPasado && !esDomingo)
+      ? `onclick="seleccionarFecha(${calAnio},${calMes},${d})"`
+      : '';
+
+    grid.innerHTML += `<div class="${clases}" ${onclick}>${d}</div>`;
+  }
+}
+
+function cambiarMes(delta) {
+  calMes += delta;
+  if (calMes < 0) { calMes = 11; calAnio--; }
+  if (calMes > 11) { calMes = 0; calAnio++; }
+  state.fecha = null;
+  state.slot = null;
+  document.getElementById('slots-grid').innerHTML = '';
+  renderCalendario();
+}
+
+async function seleccionarFecha(y, m, d) {
+  state.fecha = new Date(y, m, d);
+  state.slot = null;
+  renderCalendario();
+  await cargarSlots();
+}
+
+// ================================================
+// SLOTS DISPONIBLES
+// ================================================
+async function cargarSlots() {
+  const grid = document.getElementById('slots-grid');
+  const loading = document.getElementById('slots-loading');
+
+  grid.innerHTML = '';
+  loading.style.display = 'block';
+
+  // Intentar usar la función de Supabase; si falla, calcular localmente
+  try {
+    const fechaStr = state.fecha.toISOString().split('T')[0];
+    const { data, error } = await sb.rpc('get_slots_disponibles', {
+      p_fecha: fechaStr,
+      p_duracion_minutos: state.servicio.duracion_minutos,
+    });
+
+    loading.style.display = 'none';
+
+    if (error || !data?.length) {
+      grid.innerHTML = '<p style="grid-column:span 3;text-align:center;color:var(--text-muted);font-size:12px;padding:16px">No hay horarios disponibles para este día.</p>';
+      return;
+    }
+
+    grid.innerHTML = data.map(slot => {
+      const hora = new Date(slot.slot_inicio).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: false });
+      return `<div class="slot" onclick="seleccionarSlot('${hora}', this)">${hora}</div>`;
+    }).join('');
+
+  } catch (e) {
+    // Fallback: slots genéricos si no hay conexión con la función RPC
+    loading.style.display = 'none';
+    const slots = generarSlotsGenericos();
+    grid.innerHTML = slots.map(h =>
+      `<div class="slot" onclick="seleccionarSlot('${h}', this)">${h}</div>`
+    ).join('');
+  }
+}
+
+function generarSlotsGenericos() {
+  const slots = [];
+  for (let h = 9; h < 18; h++) {
+    slots.push(`${String(h).padStart(2,'0')}:00`);
+    if (h < 17) slots.push(`${String(h).padStart(2,'0')}:30`);
+  }
+  return slots;
+}
+
+function seleccionarSlot(hora, el) {
+  if (el.classList.contains('ocupado')) return;
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  state.slot = hora;
+}
+
+function irAConfirmar() {
+  if (!state.fecha) return showAlert('alert-fecha', 'Seleccioná un día.');
+  if (!state.slot) return showAlert('alert-fecha', 'Seleccioná un horario.');
+  renderResumen();
+  irA('screen-confirmar');
+}
+
+// ================================================
+// PASO 4: RESUMEN Y CONFIRMACIÓN
+// ================================================
+function renderResumen() {
+  const fechaStr = state.fecha.toLocaleDateString('es', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+
+  const html = `
+    <div class="resumen-item">
+      <div class="resumen-icon">👤</div>
+      <div><div class="resumen-label">Cliente</div><div class="resumen-val">${state.nombre}</div></div>
+    </div>
+    <div class="resumen-item">
+      <div class="resumen-icon">✨</div>
+      <div><div class="resumen-label">Servicio</div><div class="resumen-val">${state.servicio.nombre}</div></div>
+    </div>
+    <div class="resumen-item">
+      <div class="resumen-icon">📅</div>
+      <div><div class="resumen-label">Fecha</div><div class="resumen-val" style="text-transform:capitalize">${fechaStr}</div></div>
+    </div>
+    <div class="resumen-item">
+      <div class="resumen-icon">⏰</div>
+      <div><div class="resumen-label">Hora</div><div class="resumen-val">${state.slot} hs</div></div>
+    </div>
+    <div class="resumen-item">
+      <div class="resumen-icon">💰</div>
+      <div><div class="resumen-label">Precio</div><div class="resumen-val" style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700">$${Number(state.servicio.precio).toLocaleString('es')}</div></div>
+    </div>
+  `;
+
+  document.getElementById('resumen-container').innerHTML = html;
+}
+
+async function confirmarCita() {
+  const btn = document.getElementById('btn-confirmar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Confirmando...';
+
+  const notas = document.getElementById('input-notas').value.trim();
+  state.notas = notas;
+
+  // Construir fecha+hora combinadas
+  const [hh, mm] = state.slot.split(':');
+  const fechaHora = new Date(state.fecha);
+  fechaHora.setHours(parseInt(hh), parseInt(mm), 0, 0);
+
+  try {
+    const { data, error } = await sb.from('citas').insert({
+      cliente_id: state.clienteId,
+      servicio_id: state.servicio.id,
+      servicio_nombre: state.servicio.nombre,
+      servicio_precio: state.servicio.precio,
+      servicio_duracion: state.servicio.duracion_minutos,
+      fecha_hora: fechaHora.toISOString(),
+      estado: 'pendiente',
+      origen: 'web',
+      notas: notas || null,
+    }).select().single();
+
+    if (error) throw error;
+
+    // Encolar notificación WhatsApp
+    await sb.from('notificaciones_whatsapp').insert({
+      cliente_id: state.clienteId,
+      cita_id: data.id,
+      tipo: 'confirmacion_cita',
+      mensaje: generarMensajeConfirmacion(),
+      telefono_destino: state.telefono,
+      estado: 'pendiente',
+    });
+
+    mostrarExito();
+
+  } catch (e) {
+    console.error(e);
+    showAlert('alert-confirmar', 'Hubo un error al confirmar. Intentá de nuevo.');
+    btn.disabled = false;
+    btn.innerHTML = 'Confirmar cita';
+  }
+}
+
+function generarMensajeConfirmacion() {
+  const fechaStr = state.fecha.toLocaleDateString('es', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+  return `¡Hola ${state.nombre}! 🌿 Tu cita en Lash Cataleya ha sido registrada exitosamente.\n\n✨ Servicio: ${state.servicio.nombre}\n📅 Fecha: ${fechaStr}\n⏰ Hora: ${state.slot} hs\n💰 Precio: $${Number(state.servicio.precio).toLocaleString('es')}\n\nTe confirmaremos la cita a la brevedad. ¡Gracias por elegirnos!`;
+}
+
+function mostrarExito() {
+  const fechaStr = state.fecha.toLocaleDateString('es', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+
+  document.getElementById('exito-texto').textContent =
+    `Tu solicitud fue enviada. Recibirás una confirmación por WhatsApp en breve.`;
+
+  document.getElementById('resumen-exito').innerHTML = `
+    <div class="resumen-item">
+      <div class="resumen-icon">✨</div>
+      <div><div class="resumen-label">Servicio</div><div class="resumen-val">${state.servicio.nombre}</div></div>
+    </div>
+    <div class="resumen-item">
+      <div class="resumen-icon">📅</div>
+      <div><div class="resumen-label">Fecha</div><div class="resumen-val" style="text-transform:capitalize">${fechaStr} · ${state.slot} hs</div></div>
+    </div>
+  `;
+
+  // Link de WhatsApp con mensaje pre-armado
+  const msg = encodeURIComponent(generarMensajeConfirmacion());
+  document.getElementById('btn-whatsapp').href =
+    `https://wa.me/${WHATSAPP_NEGOCIO.replace(/\D/g,'')}?text=${msg}`;
+
+  irA('screen-exito');
+}
+
+function nuevaReserva() {
+  // Reset estado
+  Object.assign(state, {
+    nombre:'', telefono:'', email:'',
+    clienteId: null, servicio: null,
+    fecha: null, slot: null, notas: '',
+  });
+  document.getElementById('input-nombre').value = '';
+  document.getElementById('input-telefono').value = '';
+  document.getElementById('input-email').value = '';
+  document.getElementById('input-notas').value = '';
+  calMes = new Date().getMonth();
+  calAnio = new Date().getFullYear();
+  irA('screen-cliente');
+}
+</script>
+</body>
+</html>
