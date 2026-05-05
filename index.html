@@ -2,455 +2,233 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lash Cataleya — Reserva tu cita</title>
-
-  <!-- Supabase JS v2 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- Google Fonts -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Lash Cataleya — Reservas</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#243C2C">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* ==================== VARIABLES ==================== */
     :root {
-      --glaucous:    #59789F;
-      --powder:      #A9B6C4;
-      --vanilla:     #ECE69D;
-      --moss:        #7A9445;
-      --dark:        #243C2C;
-      --bg:          #F5F6F0;
-      --surface:     #FFFFFF;
-      --surface-var: #EEF2E8;
-      --divider:     #D4DDD0;
-      --text:        #243C2C;
-      --text-sec:    #4A6350;
-      --text-muted:  #8A9E8E;
-      --error:       #B85C5C;
-      --success:     #7A9445;
+      --glaucous:  #59789F;
+      --powder:    #A9B6C4;
+      --vanilla:   #ECE69D;
+      --moss:      #7A9445;
+      --dark:      #243C2C;
+      --bg:        #F5F6F0;
+      --surface:   #FFFFFF;
+      --sv:        #EEF2E8;
+      --divider:   #D4DDD0;
+      --text:      #243C2C;
+      --sec:       #4A6350;
+      --muted:     #8A9E8E;
+      --error:     #B85C5C;
+      --success:   #7A9445;
+      --warn:      #D4A017;
     }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Nunito', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    /* ==================== HEADER ==================== */
+    /* ── HEADER ── */
     header {
-      background: linear-gradient(135deg, var(--dark), var(--moss));
-      padding: 32px 20px 40px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+      background:linear-gradient(135deg,var(--dark),var(--moss));
+      padding:28px 20px 36px; text-align:center; position:relative;
     }
+    .logo { width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15);
+      border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;
+      justify-content:center;margin:0 auto 12px;font-family:'Cormorant Garamond',serif;
+      font-size:26px;font-weight:700;color:#fff; }
+    header h1 { font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:#fff; }
+    header p  { font-size:12px;color:rgba(255,255,255,.65);margin-top:4px; }
 
-    header::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -20%;
-      width: 140%;
-      height: 200%;
-      background: radial-gradient(ellipse, rgba(255,255,255,0.04) 0%, transparent 70%);
+    /* ── TABS en header ── */
+    .header-tabs { display:flex;gap:8px;justify-content:center;margin-top:18px; }
+    .htab {
+      padding:7px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;
+      border:none;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);
+      transition:all .2s;font-family:'Nunito',sans-serif;
     }
+    .htab.active { background:#fff;color:var(--dark); }
 
-    .header-logo {
-      width: 72px; height: 72px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.15);
-      border: 2px solid rgba(255,255,255,0.25);
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 16px;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 28px; font-weight: 700;
-      color: white;
+    /* ── CONTAINER ── */
+    .container { max-width:480px;margin:-20px auto 0;padding:0 16px 80px;position:relative;z-index:1; }
+
+    /* ── CARD ── */
+    .card { background:var(--surface);border-radius:20px;border:1px solid var(--divider);
+      padding:24px;margin-bottom:16px;box-shadow:0 2px 12px rgba(36,60,44,.06); }
+    .card-title { font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:4px; }
+    .card-sub   { font-size:12px;color:var(--muted);margin-bottom:20px; }
+
+    /* ── FORM ── */
+    .form-group { margin-bottom:14px; }
+    label { display:block;font-size:11px;font-weight:700;color:var(--muted);
+      text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px; }
+    input,select,textarea {
+      width:100%;padding:12px 14px;border-radius:12px;border:none;
+      background:var(--sv);font-family:'Nunito',sans-serif;font-size:14px;
+      color:var(--text);outline:none;transition:box-shadow .2s;-webkit-appearance:none;
     }
+    input:focus,select:focus,textarea:focus { box-shadow:0 0 0 2px var(--moss); }
+    input::placeholder,textarea::placeholder { color:var(--muted); }
 
-    header h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 28px; font-weight: 700;
-      color: white; letter-spacing: 0.5px;
+    /* ── PIN INPUT ── */
+    .pin-row { display:flex;gap:10px;justify-content:center;margin:20px 0; }
+    .pin-box {
+      width:56px;height:64px;border-radius:14px;border:2px solid var(--divider);
+      background:var(--sv);font-size:28px;font-weight:700;text-align:center;
+      color:var(--text);outline:none;transition:all .2s;font-family:'Nunito',sans-serif;
     }
+    .pin-box:focus { border-color:var(--moss);box-shadow:0 0 0 3px rgba(122,148,69,.15); }
 
-    header p {
-      font-size: 13px; color: rgba(255,255,255,0.7);
-      margin-top: 4px;
+    /* ── BOTONES ── */
+    .btn { width:100%;padding:14px;border-radius:12px;border:none;
+      font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
+      cursor:pointer;transition:all .2s;margin-top:4px; }
+    .btn-primary  { background:var(--moss);color:#fff; }
+    .btn-primary:hover  { background:var(--dark); }
+    .btn-primary:disabled { background:var(--divider);color:var(--muted);cursor:not-allowed; }
+    .btn-secondary { background:var(--sv);color:var(--sec);margin-top:8px; }
+    .btn-outline  { background:transparent;color:var(--moss);border:1.5px solid var(--moss); }
+    .btn-danger   { background:transparent;color:var(--error);border:1.5px solid rgba(184,92,92,.4); }
+    .btn-sm       { padding:8px 16px;width:auto;font-size:12px;border-radius:10px; }
+
+    /* ── SERVICIOS GRID ── */
+    .srv-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+    .srv-card {
+      border:2px solid var(--divider);border-radius:14px;padding:14px 12px;
+      cursor:pointer;transition:all .2s;background:var(--surface);
     }
+    .srv-card:hover  { border-color:var(--moss);background:var(--sv); }
+    .srv-card.sel    { border-color:var(--moss);background:rgba(122,148,69,.08); }
+    .srv-nombre      { font-size:13px;font-weight:700;margin-bottom:4px; }
+    .srv-cat         { font-size:10px;font-weight:600;color:var(--glaucous);text-transform:uppercase;letter-spacing:.3px; }
+    .srv-precio      { font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--dark);margin-top:8px; }
+    .srv-dur         { font-size:10px;color:var(--muted);margin-top:2px; }
 
-    /* ==================== CONTENEDOR ==================== */
-    .container {
-      max-width: 480px;
-      margin: -20px auto 0;
-      padding: 0 16px 80px;
-      position: relative;
-      z-index: 1;
-    }
+    /* ── CALENDARIO ── */
+    .cal-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; }
+    .cal-nav    { width:36px;height:36px;border-radius:50%;border:none;background:var(--sv);
+      cursor:pointer;font-size:16px;color:var(--text);display:flex;align-items:center;
+      justify-content:center;transition:background .2s; }
+    .cal-nav:hover { background:var(--divider); }
+    .cal-month  { font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600; }
+    .cal-grid   { display:grid;grid-template-columns:repeat(7,1fr);gap:4px; }
+    .cal-dn     { text-align:center;font-size:10px;font-weight:700;color:var(--muted);padding:4px 0;text-transform:uppercase; }
+    .cal-day    { aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+      border-radius:50%;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text); }
+    .cal-day:hover:not(.dis):not(.emp) { background:var(--sv); }
+    .cal-day.sel  { background:var(--moss)!important;color:#fff!important;font-weight:700; }
+    .cal-day.hoy  { color:var(--moss);font-weight:700; }
+    .cal-day.dis  { color:var(--divider);cursor:not-allowed; }
+    .cal-day.emp  { cursor:default; }
 
-    /* ==================== CARD ==================== */
-    .card {
-      background: var(--surface);
-      border-radius: 20px;
-      border: 1px solid var(--divider);
-      padding: 24px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 12px rgba(36,60,44,0.06);
-    }
+    /* ── SLOTS ── */
+    .slots-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px; }
+    .slot { padding:10px 6px;border-radius:10px;border:2px solid var(--divider);
+      text-align:center;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s;background:var(--surface); }
+    .slot:hover  { border-color:var(--moss);background:var(--sv); }
+    .slot.sel    { border-color:var(--moss);background:rgba(122,148,69,.1);color:var(--moss); }
+    .slot.ocup   { background:var(--sv);color:var(--muted);cursor:not-allowed;text-decoration:line-through; }
 
-    .card-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px; font-weight: 600;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
+    /* ── RESUMEN ── */
+    .res-item { display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--divider); }
+    .res-item:last-child { border-bottom:none; }
+    .res-icon { width:36px;height:36px;border-radius:10px;background:rgba(122,148,69,.1);
+      display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0; }
+    .res-lbl  { font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px; }
+    .res-val  { font-size:14px;font-weight:600;color:var(--text); }
 
-    .card-subtitle {
-      font-size: 12px; color: var(--text-muted);
-      margin-bottom: 20px;
-    }
+    /* ── BADGE / CHIP ── */
+    .badge { display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;
+      font-size:10px;font-weight:700;letter-spacing:.3px; }
+    .badge-green  { background:rgba(122,148,69,.12);color:var(--moss); }
+    .badge-blue   { background:rgba(89,120,159,.12);color:var(--glaucous); }
+    .badge-warn   { background:rgba(212,160,23,.12);color:var(--warn); }
+    .badge-red    { background:rgba(184,92,92,.12);color:var(--error); }
+    .badge-gray   { background:var(--sv);color:var(--muted); }
 
-    /* ==================== PASOS ==================== */
-    .steps {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
+    /* ── CITA CARD (portal) ── */
+    .cita-card { padding:16px;border-radius:14px;border:1px solid var(--divider);
+      background:var(--surface);margin-bottom:10px;position:relative; }
+    .cita-card .bar { position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:7px 0 0 7px; }
+    .cita-card-inner { padding-left:14px; }
 
-    .step {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 11px; font-weight: 600;
-      color: var(--text-muted);
-    }
+    /* ── PUNTO BAR ── */
+    .pts-bar { height:10px;border-radius:5px;background:var(--sv);overflow:hidden;margin:8px 0; }
+    .pts-fill { height:100%;border-radius:5px;background:linear-gradient(to right,var(--glaucous),var(--moss));
+      transition:width .6s ease; }
 
-    .step-num {
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700;
-      background: var(--surface-var);
-      color: var(--text-muted);
-      transition: all 0.2s;
-    }
+    /* ── RECOMPENSA ── */
+    .reward { display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;
+      border:1.5px solid var(--divider);margin-bottom:10px;transition:all .2s; }
+    .reward.ok { border-color:rgba(122,148,69,.4);background:rgba(122,148,69,.04); }
+    .reward-icon { width:44px;height:44px;border-radius:12px;display:flex;align-items:center;
+      justify-content:center;font-size:22px;flex-shrink:0; }
 
-    .step.active .step-num {
-      background: var(--moss);
-      color: white;
-    }
+    /* ── HISTORIAL ── */
+    .hist-item { display:flex;align-items:center;gap:12px;padding:12px 0;
+      border-bottom:1px solid var(--divider); }
+    .hist-item:last-child { border-bottom:none; }
+    .hist-dot { width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+      justify-content:center;font-size:14px;flex-shrink:0; }
 
-    .step.done .step-num {
-      background: var(--glaucous);
-      color: white;
-    }
+    /* ── ALERTS ── */
+    .alert { padding:12px 16px;border-radius:10px;font-size:12px;font-weight:600;
+      margin-bottom:14px;display:none; }
+    .alert-err  { background:rgba(184,92,92,.1);color:var(--error);border:1px solid rgba(184,92,92,.2); }
+    .alert-ok   { background:rgba(122,148,69,.1);color:var(--moss);border:1px solid rgba(122,148,69,.2); }
+    .alert-info { background:rgba(89,120,159,.1);color:var(--glaucous);border:1px solid rgba(89,120,159,.2); }
 
-    .step-line {
-      width: 20px; height: 2px;
-      background: var(--divider);
-      border-radius: 1px;
-    }
+    /* ── SPINNER ── */
+    .spin { display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.4);
+      border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle; }
+    @keyframes sp { to{transform:rotate(360deg)} }
 
-    /* ==================== FORMULARIO ==================== */
-    .form-group { margin-bottom: 14px; }
+    /* ── LOADING ── */
+    .loading { text-align:center;padding:32px;color:var(--muted);font-size:13px; }
+    .loading::before { content:'🌿';display:block;font-size:28px;margin-bottom:8px;
+      animation:pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
-    label {
-      display: block;
-      font-size: 11px; font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
+    /* ── SCREENS ── */
+    .screen { display:none; }
+    .screen.active { display:block; }
 
-    input, select, textarea {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: none;
-      background: var(--surface-var);
-      font-family: 'Nunito', sans-serif;
-      font-size: 14px; color: var(--text);
-      outline: none;
-      transition: box-shadow 0.2s;
-      -webkit-appearance: none;
-    }
+    /* ── EMPTY STATE ── */
+    .empty { text-align:center;padding:40px 20px;color:var(--muted); }
+    .empty .ei { font-size:40px;margin-bottom:12px; }
+    .empty p   { font-size:13px; }
 
-    input:focus, select:focus, textarea:focus {
-      box-shadow: 0 0 0 2px var(--moss);
-    }
+    /* ── SUCCESS ── */
+    .success-icon { width:72px;height:72px;border-radius:50%;background:rgba(122,148,69,.12);
+      display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px; }
 
-    input::placeholder, textarea::placeholder {
-      color: var(--text-muted);
-    }
+    /* ── NAV bottom (portal) ── */
+    .bottom-nav { position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;
+      background:var(--surface);border-top:1px solid var(--divider);
+      display:none;z-index:100;
+      box-shadow:0 -4px 20px rgba(36,60,44,.06); }
+    .bottom-nav.show { display:flex; }
+    .bnav-item { flex:1;display:flex;flex-direction:column;align-items:center;
+      padding:10px 4px 14px;cursor:pointer;color:var(--muted);font-size:10px;
+      font-weight:700;gap:4px;border:none;background:none;font-family:'Nunito',sans-serif;
+      transition:color .2s; }
+    .bnav-item.act { color:var(--moss); }
+    .bnav-item svg { width:22px;height:22px;stroke-width:1.8;stroke:currentColor;fill:none; }
 
-    /* ==================== SERVICIOS GRID ==================== */
-    .servicios-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    /* ── MODAL ── */
+    .modal-bg { position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+      display:none;align-items:flex-end;justify-content:center; }
+    .modal-bg.show { display:flex; }
+    .modal { background:var(--surface);border-radius:24px 24px 0 0;padding:24px;
+      width:100%;max-width:480px;max-height:90vh;overflow-y:auto; }
+    .modal-handle { width:40px;height:4px;background:var(--divider);border-radius:2px;margin:0 auto 20px; }
 
-    .servicio-card {
-      border: 2px solid var(--divider);
-      border-radius: 14px;
-      padding: 14px 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: var(--surface);
-    }
-
-    .servicio-card:hover {
-      border-color: var(--moss);
-      background: var(--surface-var);
-    }
-
-    .servicio-card.selected {
-      border-color: var(--moss);
-      background: rgba(122, 148, 69, 0.08);
-    }
-
-    .servicio-nombre {
-      font-size: 13px; font-weight: 700;
-      color: var(--text); margin-bottom: 4px;
-    }
-
-    .servicio-cat {
-      font-size: 10px; font-weight: 600;
-      color: var(--glaucous);
-      text-transform: uppercase; letter-spacing: 0.3px;
-    }
-
-    .servicio-precio {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 18px; font-weight: 700;
-      color: var(--dark); margin-top: 8px;
-    }
-
-    .servicio-dur {
-      font-size: 10px; color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    /* ==================== CALENDARIO ==================== */
-    .calendar-header {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .cal-nav {
-      width: 36px; height: 36px;
-      border-radius: 50%; border: none;
-      background: var(--surface-var);
-      cursor: pointer; font-size: 16px;
-      color: var(--text); display: flex;
-      align-items: center; justify-content: center;
-      transition: background 0.2s;
-    }
-
-    .cal-nav:hover { background: var(--divider); }
-
-    .cal-month {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 18px; font-weight: 600;
-    }
-
-    .cal-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-    }
-
-    .cal-day-name {
-      text-align: center;
-      font-size: 10px; font-weight: 700;
-      color: var(--text-muted);
-      padding: 4px 0; text-transform: uppercase;
-    }
-
-    .cal-day {
-      aspect-ratio: 1;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      font-size: 13px; font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
-      color: var(--text);
-    }
-
-    .cal-day:hover:not(.disabled):not(.empty) {
-      background: var(--surface-var);
-    }
-
-    .cal-day.selected {
-      background: var(--moss) !important;
-      color: white !important;
-      font-weight: 700;
-    }
-
-    .cal-day.today {
-      color: var(--moss);
-      font-weight: 700;
-    }
-
-    .cal-day.disabled {
-      color: var(--divider);
-      cursor: not-allowed;
-    }
-
-    .cal-day.empty { cursor: default; }
-
-    /* ==================== SLOTS ==================== */
-    .slots-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .slot {
-      padding: 10px 6px;
-      border-radius: 10px;
-      border: 2px solid var(--divider);
-      text-align: center;
-      cursor: pointer;
-      font-size: 13px; font-weight: 600;
-      transition: all 0.15s;
-      background: var(--surface);
-    }
-
-    .slot:hover { border-color: var(--moss); background: var(--surface-var); }
-    .slot.selected { border-color: var(--moss); background: rgba(122,148,69,0.1); color: var(--moss); }
-    .slot.ocupado { background: var(--surface-var); color: var(--text-muted); cursor: not-allowed; text-decoration: line-through; }
-
-    /* ==================== BOTÓN ==================== */
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      font-family: 'Nunito', sans-serif;
-      font-size: 14px; font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 4px;
-    }
-
-    .btn-primary {
-      background: var(--moss);
-      color: white;
-    }
-
-    .btn-primary:hover { background: var(--dark); }
-    .btn-primary:disabled { background: var(--divider); color: var(--text-muted); cursor: not-allowed; }
-
-    .btn-secondary {
-      background: var(--surface-var);
-      color: var(--text-sec);
-      margin-top: 8px;
-    }
-
-    .btn-secondary:hover { background: var(--divider); }
-
-    /* ==================== RESUMEN CITA ==================== */
-    .resumen-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--divider);
-    }
-
-    .resumen-item:last-child { border-bottom: none; }
-
-    .resumen-icon {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      background: rgba(122,148,69,0.1);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; flex-shrink: 0;
-    }
-
-    .resumen-label {
-      font-size: 10px; font-weight: 700;
-      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px;
-    }
-
-    .resumen-val {
-      font-size: 14px; font-weight: 600; color: var(--text);
-    }
-
-    /* ==================== ÉXITO ==================== */
-    .success-icon {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      background: rgba(122,148,69,0.12);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 36px;
-      margin: 0 auto 20px;
-    }
-
-    .success-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px; font-weight: 700;
-      text-align: center; color: var(--dark);
-      margin-bottom: 8px;
-    }
-
-    .success-text {
-      font-size: 13px; color: var(--text-muted);
-      text-align: center; line-height: 1.6;
-      margin-bottom: 24px;
-    }
-
-    /* ==================== LOADING / SPINNER ==================== */
-    .spinner {
-      display: inline-block;
-      width: 20px; height: 20px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loading-slots {
-      text-align: center;
-      padding: 24px;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    /* ==================== ALERTA ==================== */
-    .alert {
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 12px; font-weight: 600;
-      margin-bottom: 14px;
-      display: none;
-    }
-
-    .alert-error { background: rgba(184,92,92,0.1); color: var(--error); border: 1px solid rgba(184,92,92,0.2); }
-    .alert-info  { background: rgba(89,120,159,0.1); color: var(--glaucous); border: 1px solid rgba(89,120,159,0.2); }
-
-    /* ==================== PANTALLAS ==================== */
-    .screen { display: none; }
-    .screen.active { display: block; }
-
-    /* ==================== FOOTER ==================== */
-    .footer {
-      text-align: center;
-      font-size: 11px;
-      color: var(--text-muted);
-      padding: 24px 0 0;
-    }
-
-    /* ==================== RESPONSIVE ==================== */
-    @media (max-width: 380px) {
-      .servicios-grid { grid-template-columns: 1fr; }
-      .slots-grid { grid-template-columns: repeat(2, 1fr); }
+    @media(max-width:380px) {
+      .srv-grid  { grid-template-columns:1fr; }
+      .slots-grid { grid-template-columns:repeat(2,1fr); }
+      .pin-box   { width:48px;height:56px;font-size:24px; }
     }
   </style>
 </head>
@@ -458,571 +236,898 @@
 
 <!-- HEADER -->
 <header>
-  <div class="header-logo">LC</div>
+  <div class="logo">LC</div>
   <h1>Lash Cataleya</h1>
-  <p>Reserva tu cita en línea</p>
+  <p>Reservas y portal de clientes</p>
+  <div class="header-tabs">
+    <button class="htab active" onclick="showTab('reserva')">✨ Reservar</button>
+    <button class="htab" onclick="showTab('portal')">👤 Mi cuenta</button>
+  </div>
 </header>
 
 <div class="container">
 
-  <!-- ===================== PASO 1: DATOS DEL CLIENTE ===================== -->
-  <div class="screen active" id="screen-cliente">
+<!-- ═══════════════ SECCIÓN: RESERVAR ═══════════════ -->
+<div id="sec-reserva">
+
+  <!-- PASO 1: Datos -->
+  <div class="screen active" id="s-datos">
     <div class="card">
-      <div class="steps">
-        <div class="step active" id="step1"><div class="step-num">1</div><span>Tus datos</span></div>
-        <div class="step-line"></div>
-        <div class="step" id="step2"><div class="step-num">2</div><span>Servicio</span></div>
-        <div class="step-line"></div>
-        <div class="step" id="step3"><div class="step-num">3</div><span>Fecha</span></div>
-        <div class="step-line"></div>
-        <div class="step" id="step4"><div class="step-num">4</div><span>Confirmar</span></div>
-      </div>
-
-      <p class="card-title">¡Hola! ¿Quién eres?</p>
-      <p class="card-subtitle">Ingresá tu número para identificarte</p>
-
-      <div id="alert-cliente" class="alert alert-error"></div>
-
+      <p class="card-title">¡Hola! ¿Quién sos?</p>
+      <p class="card-sub">Ingresá tu número para identificarte</p>
+      <div id="al-datos" class="alert alert-err"></div>
       <div class="form-group">
         <label>Nombre completo</label>
-        <input type="text" id="input-nombre" placeholder="Tu nombre" autocomplete="name">
+        <input id="r-nombre" type="text" placeholder="Tu nombre" autocomplete="name">
       </div>
-
       <div class="form-group">
         <label>WhatsApp</label>
-        <input type="tel" id="input-telefono" placeholder="3751312344" autocomplete="tel">
+        <input id="r-tel" type="tel" placeholder="+54 9 XXX XXX XXXX" autocomplete="tel">
       </div>
-
       <div class="form-group">
         <label>Email (opcional)</label>
-        <input type="email" id="input-email" placeholder="tu@email.com" autocomplete="email">
+        <input id="r-email" type="email" placeholder="tu@email.com">
       </div>
-
-      <button class="btn btn-primary" onclick="irAServicios()">
-        Continuar →
-      </button>
-    </div>
-
-    <div class="footer">
-      Tus datos están protegidos y solo serán usados para gestionar tu cita.
+      <button class="btn btn-primary" onclick="r_paso1()">Continuar →</button>
     </div>
   </div>
 
-  <!-- ===================== PASO 2: SERVICIO ===================== -->
-  <div class="screen" id="screen-servicio">
+  <!-- PASO 2: Servicio -->
+  <div class="screen" id="s-servicio">
     <div class="card">
-      <div class="steps">
-        <div class="step done" id="step1b"><div class="step-num">✓</div></div>
-        <div class="step-line"></div>
-        <div class="step active"><div class="step-num">2</div><span>Servicio</span></div>
-        <div class="step-line"></div>
-        <div class="step"><div class="step-num">3</div></div>
-        <div class="step-line"></div>
-        <div class="step"><div class="step-num">4</div></div>
-      </div>
-
       <p class="card-title">¿Qué servicio querés?</p>
-      <p class="card-subtitle">Seleccioná un servicio para continuar</p>
-
-      <div id="alert-servicio" class="alert alert-error"></div>
-      <div id="servicios-container" class="servicios-grid">
-        <div class="loading-slots">Cargando servicios...</div>
-      </div>
-
-      <button class="btn btn-primary" style="margin-top: 20px" onclick="irAFecha()">
-        Continuar →
-      </button>
-      <button class="btn btn-secondary" onclick="irA('screen-cliente')">← Volver</button>
+      <p class="card-sub">Tocá para seleccionar</p>
+      <div id="al-srv" class="alert alert-err"></div>
+      <div id="srv-grid" class="srv-grid"><div class="loading"></div></div>
+      <button class="btn btn-primary" style="margin-top:20px" onclick="r_paso2()">Continuar →</button>
+      <button class="btn btn-secondary" onclick="irA('s-datos','s-servicio')">← Volver</button>
     </div>
   </div>
 
-  <!-- ===================== PASO 3: FECHA Y HORA ===================== -->
-  <div class="screen" id="screen-fecha">
+  <!-- PASO 3: Fecha y hora -->
+  <div class="screen" id="s-fecha">
     <div class="card">
-      <div class="steps">
-        <div class="step done"><div class="step-num">✓</div></div>
-        <div class="step-line"></div>
-        <div class="step done"><div class="step-num">✓</div></div>
-        <div class="step-line"></div>
-        <div class="step active"><div class="step-num">3</div><span>Fecha</span></div>
-        <div class="step-line"></div>
-        <div class="step"><div class="step-num">4</div></div>
-      </div>
-
       <p class="card-title">¿Cuándo venís?</p>
-      <p class="card-subtitle">Elegí el día y horario que mejor te quede</p>
-
-      <div id="alert-fecha" class="alert alert-error"></div>
-
-      <!-- CALENDARIO -->
-      <div class="calendar-header">
-        <button class="cal-nav" onclick="cambiarMes(-1)">&#8249;</button>
-        <span class="cal-month" id="cal-mes-label"></span>
-        <button class="cal-nav" onclick="cambiarMes(1)">&#8250;</button>
+      <p class="card-sub">Elegí el día y horario disponible</p>
+      <div id="al-fecha" class="alert alert-err"></div>
+      <div class="cal-header">
+        <button class="cal-nav" onclick="calMes(-1)">&#8249;</button>
+        <span class="cal-month" id="cal-label"></span>
+        <button class="cal-nav" onclick="calMes(1)">&#8250;</button>
       </div>
-
       <div class="cal-grid" id="cal-grid"></div>
-
-      <!-- SLOTS -->
-      <div id="slots-container">
-        <div class="loading-slots" style="display:none" id="slots-loading">
-          Buscando horarios disponibles...
-        </div>
-        <div class="slots-grid" id="slots-grid"></div>
+      <div id="slots-wrap">
+        <p id="slots-hint" style="text-align:center;color:var(--muted);font-size:12px;margin-top:16px">
+          Seleccioná un día para ver horarios disponibles
+        </p>
+        <div id="slots-grid" class="slots-grid"></div>
       </div>
-
-      <button class="btn btn-primary" style="margin-top: 20px" onclick="irAConfirmar()">
-        Continuar →
-      </button>
-      <button class="btn btn-secondary" onclick="irA('screen-servicio')">← Volver</button>
+      <button class="btn btn-primary" style="margin-top:20px" onclick="r_paso3()">Continuar →</button>
+      <button class="btn btn-secondary" onclick="irA('s-servicio','s-fecha')">← Volver</button>
     </div>
   </div>
 
-  <!-- ===================== PASO 4: CONFIRMAR ===================== -->
-  <div class="screen" id="screen-confirmar">
+  <!-- PASO 4: Confirmar -->
+  <div class="screen" id="s-confirmar">
     <div class="card">
-      <div class="steps">
-        <div class="step done"><div class="step-num">✓</div></div>
-        <div class="step-line"></div>
-        <div class="step done"><div class="step-num">✓</div></div>
-        <div class="step-line"></div>
-        <div class="step done"><div class="step-num">✓</div></div>
-        <div class="step-line"></div>
-        <div class="step active"><div class="step-num">4</div><span>Confirmar</span></div>
-      </div>
-
       <p class="card-title">Resumen de tu cita</p>
-      <p class="card-subtitle">Revisá los datos antes de confirmar</p>
-
-      <div id="alert-confirmar" class="alert alert-error"></div>
-
-      <div id="resumen-container"></div>
-
-      <div class="form-group" style="margin-top: 16px">
+      <p class="card-sub">Revisá antes de confirmar</p>
+      <div id="al-conf" class="alert alert-err"></div>
+      <div id="res-wrap"></div>
+      <div class="form-group" style="margin-top:16px">
         <label>Notas adicionales (opcional)</label>
-        <textarea id="input-notas" rows="3" placeholder="Preferencias, notas adicionales..."></textarea>
+        <textarea id="r-notas" rows="3" placeholder="Preferencias, notas adicionales..."></textarea>
       </div>
-
-      <button class="btn btn-primary" id="btn-confirmar" onclick="confirmarCita()">
-        Confirmar cita
-      </button>
-      <button class="btn btn-secondary" onclick="irA('screen-fecha')">← Volver</button>
+      <button class="btn btn-primary" id="btn-conf" onclick="r_confirmar()">Confirmar cita</button>
+      <button class="btn btn-secondary" onclick="irA('s-fecha','s-confirmar')">← Volver</button>
     </div>
   </div>
 
-  <!-- ===================== ÉXITO ===================== -->
-  <div class="screen" id="screen-exito">
-    <div class="card" style="text-align: center; padding: 40px 24px">
+  <!-- ÉXITO -->
+  <div class="screen" id="s-exito">
+    <div class="card" style="text-align:center;padding:40px 24px">
       <div class="success-icon">🌿</div>
-      <p class="success-title">¡Cita agendada!</p>
-      <p class="success-text" id="exito-texto"></p>
-
-      <div id="resumen-exito" style="text-align: left; margin-bottom: 24px"></div>
-
-      <a id="btn-whatsapp" href="#" target="_blank"
-         style="display:block; background: #25D366; color: white; padding: 14px;
-                border-radius: 12px; text-decoration: none; font-weight: 700;
-                font-size: 14px; margin-bottom: 10px;">
-        💬 Abrir confirmación en WhatsApp
+      <p class="card-title" style="text-align:center">¡Cita registrada!</p>
+      <p id="ex-texto" style="font-size:13px;color:var(--muted);margin-top:6px;line-height:1.6"></p>
+      <div id="ex-res" style="text-align:left;margin:20px 0"></div>
+      <a id="ex-wa" href="#" target="_blank"
+         style="display:block;background:#25D366;color:#fff;padding:14px;border-radius:12px;
+                text-decoration:none;font-weight:700;font-size:14px;margin-bottom:10px">
+        💬 Ver confirmación en WhatsApp
       </a>
-
-      <button class="btn btn-secondary" onclick="nuevaReserva()">
-        Hacer otra reserva
-      </button>
+      <button class="btn btn-secondary" onclick="nuevaReserva()">Hacer otra reserva</button>
     </div>
   </div>
+
+</div><!-- /sec-reserva -->
+
+
+<!-- ═══════════════ SECCIÓN: PORTAL ═══════════════ -->
+<div id="sec-portal" style="display:none">
+
+  <!-- LOGIN -->
+  <div class="screen active" id="p-login">
+    <div class="card">
+      <p class="card-title">Mi cuenta</p>
+      <p class="card-sub">Ingresá tu WhatsApp y PIN para acceder</p>
+      <div id="al-login" class="alert alert-err"></div>
+      <div id="al-login-ok" class="alert alert-ok"></div>
+      <div class="form-group">
+        <label>WhatsApp</label>
+        <input id="p-tel" type="tel" placeholder="+54 9 XXX XXX XXXX">
+      </div>
+      <div class="form-group">
+        <label>PIN de 4 dígitos</label>
+        <div class="pin-row">
+          <input class="pin-box" type="password" maxlength="1" inputmode="numeric" id="pin0" oninput="pinNext(0)">
+          <input class="pin-box" type="password" maxlength="1" inputmode="numeric" id="pin1" oninput="pinNext(1)">
+          <input class="pin-box" type="password" maxlength="1" inputmode="numeric" id="pin2" oninput="pinNext(2)">
+          <input class="pin-box" type="password" maxlength="1" inputmode="numeric" id="pin3" oninput="pinNext(3)">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-login" onclick="p_login()">Ingresar</button>
+      <button class="btn btn-secondary" onclick="p_solicitarPin()">No tengo PIN — Solicitar</button>
+    </div>
+
+    <!-- Solicitar PIN -->
+    <div id="solicitar-pin-card" class="card" style="display:none">
+      <p class="card-title" style="font-size:16px">Solicitar PIN</p>
+      <p class="card-sub">Ingresá tu WhatsApp y te enviamos un PIN de acceso</p>
+      <div id="al-sol" class="alert alert-err"></div>
+      <div id="al-sol-ok" class="alert alert-ok"></div>
+      <div class="form-group">
+        <label>WhatsApp</label>
+        <input id="sol-tel" type="tel" placeholder="+54 9 XXX XXX XXXX">
+      </div>
+      <button class="btn btn-primary" onclick="solicitarPin()">Enviar PIN por WhatsApp</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('solicitar-pin-card').style.display='none'">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- PORTAL PRINCIPAL -->
+  <div class="screen" id="p-home">
+
+    <!-- TABS -->
+    <div style="background:var(--surface);border-radius:0 0 16px 16px;padding:0 16px;
+                border:1px solid var(--divider);border-top:none;margin-bottom:16px">
+      <div style="display:flex;gap:0">
+        <button class="portal-tab act" data-tab="citas"    onclick="pTab(this,'pt-citas')">📅 Mis citas</button>
+        <button class="portal-tab"     data-tab="historial" onclick="pTab(this,'pt-hist')">📋 Historial</button>
+        <button class="portal-tab"     data-tab="lealtad"   onclick="pTab(this,'pt-leal')">⭐ Lealtad</button>
+      </div>
+    </div>
+
+    <style>
+      .portal-tab { flex:1;padding:12px 4px;border:none;background:none;font-family:'Nunito',sans-serif;
+        font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;
+        transition:all .2s; }
+      .portal-tab.act { color:var(--moss);border-bottom-color:var(--moss); }
+    </style>
+
+    <!-- TAB: CITAS PRÓXIMAS -->
+    <div id="pt-citas" class="portal-section">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <p class="card-title" id="bienvenida">Hola 👋</p>
+            <p style="font-size:12px;color:var(--muted)">Tus citas próximas</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="irAReserva()">+ Nueva cita</button>
+        </div>
+        <div id="pt-citas-list"><div class="loading"></div></div>
+      </div>
+    </div>
+
+    <!-- TAB: HISTORIAL -->
+    <div id="pt-hist" class="portal-section" style="display:none">
+      <div class="card">
+        <p class="card-title">Historial de citas</p>
+        <p class="card-sub">Todas tus visitas anteriores</p>
+        <div id="pt-hist-list"><div class="loading"></div></div>
+      </div>
+    </div>
+
+    <!-- TAB: LEALTAD -->
+    <div id="pt-leal" class="portal-section" style="display:none">
+      <div id="pt-leal-content"><div class="loading"></div></div>
+    </div>
+
+  </div><!-- /p-home -->
+
+</div><!-- /sec-portal -->
 
 </div><!-- /container -->
 
-<script>
-// ================================================
-// CONFIGURACIÓN — Reemplazá con tus datos de Supabase
-// ================================================
-const SUPABASE_URL  = 'https://bjuirffjfxkgcdmsynvm.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_SciQnIiX6CZdS9mXJgzu-Q_FVOZKgi_';
-const WHATSAPP_NEGOCIO = '+543751331237';
+<!-- BOTTOM NAV (portal) -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bnav-item act" onclick="pTab2('pt-citas',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Mis citas
+  </button>
+  <button class="bnav-item" onclick="pTab2('pt-hist',this)">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    Historial
+  </button>
+  <button class="bnav-item" onclick="pTab2('pt-leal',this)">
+    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    Lealtad
+  </button>
+  <button class="bnav-item" onclick="p_logout()">
+    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Salir
+  </button>
+</nav>
 
-// ================================================
-// INIT SUPABASE
-// ================================================
+<!-- MODAL: Cancelar cita -->
+<div class="modal-bg" id="modal-cancel">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:8px">Cancelar cita</p>
+    <p id="modal-cancel-txt" style="font-size:13px;color:var(--muted);margin-bottom:24px"></p>
+    <button class="btn btn-danger" id="modal-cancel-btn" onclick="confirmarCancelacion()">Sí, cancelar mi cita</button>
+    <button class="btn btn-secondary" onclick="cerrarModal()">Volver</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════
+const SUPABASE_URL  = 'https://bjuirffjfxkgcdmsynvm.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqdWlyZmZqZnhrZ2NkbXN5bnZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MTgwNzEsImV4cCI6MjA5Mjk5NDA3MX0.NH0PAg2MjA4KohJzdRf_r5Fw4E6sQhCJWlJ6E2C7aX4';
+const WA_NEGOCIO    = '+543751331237';
+
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// ================================================
-// ESTADO GLOBAL
-// ================================================
-const state = {
-  nombre: '', telefono: '', email: '',
-  clienteId: null,
-  servicio: null,      // objeto completo del servicio
-  fecha: null,         // Date
-  slot: null,          // string 'HH:MM'
-  notas: '',
-};
+// Estado global
+const R = { nombre:'', tel:'', email:'', clienteId:null, servicio:null, fecha:null, slot:null };
+const P = { clienteId:null, nombre:'', tel:'', puntos:0 };
+let citaACancelar = null;
 
-let calMes = new Date().getMonth();
-let calAnio = new Date().getFullYear();
+let calM = new Date().getMonth();
+let calY = new Date().getFullYear();
+let _servicios = [];
 
-// ================================================
-// NAVEGACIÓN
-// ================================================
-function irA(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
+// ════════════════════════════════════════════
+// NAVEGACIÓN PRINCIPAL
+// ════════════════════════════════════════════
+function showTab(tab) {
+  document.querySelectorAll('.htab').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  document.getElementById('sec-reserva').style.display = tab === 'reserva' ? 'block' : 'none';
+  document.getElementById('sec-portal').style.display  = tab === 'portal'  ? 'block' : 'none';
+  document.getElementById('bottom-nav').classList.toggle('show', tab === 'portal' && P.clienteId);
+}
+
+function irAReserva() {
+  document.querySelectorAll('.htab')[0].click();
+}
+
+function irA(mostrar, ocultar) {
+  document.getElementById(mostrar).classList.add('active');
+  document.getElementById(ocultar).classList.remove('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function showAlert(id, msg) {
+function showAlert(id, msg, tipo = 'err') {
   const el = document.getElementById(id);
+  el.className = `alert alert-${tipo}`;
   el.textContent = msg;
   el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 4000);
+  setTimeout(() => el.style.display = 'none', 5000);
 }
 
-// ================================================
-// PASO 1 → PASO 2: DATOS DEL CLIENTE
-// ================================================
-async function irAServicios() {
-  const nombre   = document.getElementById('input-nombre').value.trim();
-  const telefono = document.getElementById('input-telefono').value.trim();
-  const email    = document.getElementById('input-email').value.trim();
+// ════════════════════════════════════════════
+// RESERVAR — PASO 1
+// ════════════════════════════════════════════
+async function r_paso1() {
+  const nombre = document.getElementById('r-nombre').value.trim();
+  const tel    = document.getElementById('r-tel').value.trim();
+  const email  = document.getElementById('r-email').value.trim();
 
-  if (!nombre) return showAlert('alert-cliente', 'Por favor ingresá tu nombre.');
-  if (!telefono) return showAlert('alert-cliente', 'Por favor ingresá tu WhatsApp.');
+  if (!nombre) return showAlert('al-datos', 'Por favor ingresá tu nombre.');
+  if (!tel)    return showAlert('al-datos', 'Por favor ingresá tu WhatsApp.');
 
-  state.nombre = nombre;
-  state.telefono = telefono;
-  state.email = email;
+  R.nombre = nombre; R.tel = tel; R.email = email;
 
-  // Buscar o crear cliente en Supabase
   try {
-    const { data: existente } = await sb
-      .from('clientes')
-      .select('id, nombre')
-      .eq('telefono', telefono)
-      .maybeSingle();
-
-    if (existente) {
-      state.clienteId = existente.id;
+    const { data } = await sb.from('clientes').select('id,nombre')
+      .eq('telefono', tel).maybeSingle();
+    if (data) {
+      R.clienteId = data.id;
     } else {
-      const { data: nuevo, error } = await sb
-        .from('clientes')
-        .insert({ nombre, telefono, email: email || null })
-        .select('id')
-        .single();
+      const { data: nuevo, error } = await sb.from('clientes')
+        .insert({ nombre, telefono: tel, email: email || null, activo: true })
+        .select('id').single();
       if (error) throw error;
-      state.clienteId = nuevo.id;
+      R.clienteId = nuevo.id;
     }
+    await cargarServicios();
+    irA('s-servicio', 's-datos');
   } catch (e) {
-    console.error(e);
-    showAlert('alert-cliente', 'Error de conexión. Intentá de nuevo.');
-    return;
+    showAlert('al-datos', 'Error de conexión. Intentá de nuevo.');
   }
-
-  await cargarServicios();
-  irA('screen-servicio');
 }
 
-// ================================================
-// PASO 2: CARGAR SERVICIOS DESDE SUPABASE
-// ================================================
+// ════════════════════════════════════════════
+// RESERVAR — PASO 2: SERVICIOS
+// ════════════════════════════════════════════
 async function cargarServicios() {
-  const container = document.getElementById('servicios-container');
-  container.innerHTML = '<div class="loading-slots">Cargando servicios...</div>';
-
-  const { data, error } = await sb
-    .from('servicios')
-    .select()
-    .eq('activo', true)
-    .order('orden');
-
-  if (error || !data?.length) {
-    container.innerHTML = '<p style="color:var(--text-muted);font-size:13px">No hay servicios disponibles en este momento.</p>';
-    return;
-  }
-
-  container.innerHTML = data.map(s => `
-    <div class="servicio-card" id="srv-${s.id}" onclick="seleccionarServicio('${s.id}')">
-      <div class="servicio-cat">${s.categoria}</div>
-      <div class="servicio-nombre">${s.nombre}</div>
-      <div class="servicio-precio">$${Number(s.precio).toLocaleString('es')}</div>
-      <div class="servicio-dur">⏱ ${s.duracion_minutos} min</div>
-    </div>
-  `).join('');
-
-  // Guardar servicios en memoria para lookup rápido
-  window._servicios = data;
+  const grid = document.getElementById('srv-grid');
+  grid.innerHTML = '<div class="loading"></div>';
+  const { data } = await sb.from('servicios').select().eq('activo', true).order('orden');
+  _servicios = data || [];
+  if (!_servicios.length) { grid.innerHTML = '<p style="color:var(--muted);font-size:13px">Sin servicios disponibles.</p>'; return; }
+  grid.innerHTML = _servicios.map(s => `
+    <div class="srv-card" id="s${s.id}" onclick="selSrv('${s.id}')">
+      <div class="srv-cat">${s.categoria}</div>
+      <div class="srv-nombre">${s.nombre}</div>
+      <div class="srv-precio">${ars(s.precio)}</div>
+      <div class="srv-dur">⏱ ${s.duracion_minutos} min</div>
+    </div>`).join('');
 }
 
-function seleccionarServicio(id) {
-  document.querySelectorAll('.servicio-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('srv-' + id).classList.add('selected');
-  state.servicio = window._servicios.find(s => s.id === id);
+function selSrv(id) {
+  document.querySelectorAll('.srv-card').forEach(c => c.classList.remove('sel'));
+  document.getElementById('s' + id).classList.add('sel');
+  R.servicio = _servicios.find(s => s.id === id);
 }
 
-function irAFecha() {
-  if (!state.servicio) return showAlert('alert-servicio', 'Seleccioná un servicio para continuar.');
-  renderCalendario();
-  irA('screen-fecha');
+function r_paso2() {
+  if (!R.servicio) return showAlert('al-srv', 'Seleccioná un servicio para continuar.');
+  renderCal();
+  irA('s-fecha', 's-servicio');
 }
 
-// ================================================
-// PASO 3: CALENDARIO
-// ================================================
-const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
-               'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+// ════════════════════════════════════════════
+// RESERVAR — PASO 3: CALENDARIO + SLOTS
+// ════════════════════════════════════════════
+const DIAS  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
-function renderCalendario() {
-  document.getElementById('cal-mes-label').textContent = `${MESES[calMes]} ${calAnio}`;
-
+function renderCal() {
+  document.getElementById('cal-label').textContent = `${MESES[calM]} ${calY}`;
   const grid = document.getElementById('cal-grid');
-  grid.innerHTML = DIAS.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+  const hoy  = new Date(); hoy.setHours(0,0,0,0);
+  const prim = new Date(calY, calM, 1);
+  const ult  = new Date(calY, calM + 1, 0).getDate();
 
-  const hoy = new Date();
-  hoy.setHours(0,0,0,0);
+  grid.innerHTML = DIAS.map(d => `<div class="cal-dn">${d}</div>`).join('');
+  for (let i = 0; i < prim.getDay(); i++) grid.innerHTML += '<div class="cal-day emp"></div>';
 
-  const primero = new Date(calAnio, calMes, 1);
-  const ultimoDia = new Date(calAnio, calMes + 1, 0).getDate();
-  const inicioSemana = primero.getDay();
-
-  // Celdas vacías al inicio
-  for (let i = 0; i < inicioSemana; i++) {
-    grid.innerHTML += '<div class="cal-day empty"></div>';
-  }
-
-  for (let d = 1; d <= ultimoDia; d++) {
-    const fecha = new Date(calAnio, calMes, d);
-    const esPasado = fecha < hoy;
-    const esDomingo = fecha.getDay() === 0;
-    const esHoy = fecha.toDateString() === hoy.toDateString();
-    const esSeleccionado = state.fecha?.toDateString() === fecha.toDateString();
-
-    const clases = ['cal-day',
-      esPasado || esDomingo ? 'disabled' : '',
-      esHoy ? 'today' : '',
-      esSeleccionado ? 'selected' : '',
-    ].filter(Boolean).join(' ');
-
-    const onclick = (!esPasado && !esDomingo)
-      ? `onclick="seleccionarFecha(${calAnio},${calMes},${d})"`
-      : '';
-
-    grid.innerHTML += `<div class="${clases}" ${onclick}>${d}</div>`;
+  for (let d = 1; d <= ult; d++) {
+    const fecha  = new Date(calY, calM, d);
+    const pasado = fecha < hoy;
+    const dom    = fecha.getDay() === 0;
+    const esHoy  = fecha.toDateString() === hoy.toDateString();
+    const esSel  = R.fecha?.toDateString() === fecha.toDateString();
+    const cls    = ['cal-day', pasado||dom?'dis':'', esHoy?'hoy':'', esSel?'sel':''].filter(Boolean).join(' ');
+    const click  = !pasado && !dom ? `onclick="selDia(${calY},${calM},${d})"` : '';
+    grid.innerHTML += `<div class="${cls}" ${click}>${d}</div>`;
   }
 }
 
-function cambiarMes(delta) {
-  calMes += delta;
-  if (calMes < 0) { calMes = 11; calAnio--; }
-  if (calMes > 11) { calMes = 0; calAnio++; }
-  state.fecha = null;
-  state.slot = null;
+function calMes(d) {
+  calM += d;
+  if (calM < 0)  { calM = 11; calY--; }
+  if (calM > 11) { calM = 0;  calY++; }
+  R.fecha = null; R.slot = null;
   document.getElementById('slots-grid').innerHTML = '';
-  renderCalendario();
+  document.getElementById('slots-hint').style.display = 'block';
+  renderCal();
 }
 
-async function seleccionarFecha(y, m, d) {
-  state.fecha = new Date(y, m, d);
-  state.slot = null;
-  renderCalendario();
+async function selDia(y, m, d) {
+  R.fecha = new Date(y, m, d); R.slot = null;
+  renderCal();
   await cargarSlots();
 }
 
-// ================================================
-// SLOTS DISPONIBLES
-// ================================================
 async function cargarSlots() {
   const grid = document.getElementById('slots-grid');
-  const loading = document.getElementById('slots-loading');
-
+  const hint = document.getElementById('slots-hint');
+  hint.textContent = 'Buscando horarios...'; hint.style.display = 'block';
   grid.innerHTML = '';
-  loading.style.display = 'block';
 
-  // Intentar usar la función de Supabase; si falla, calcular localmente
   try {
-    const fechaStr = state.fecha.toISOString().split('T')[0];
-    const { data, error } = await sb.rpc('get_slots_disponibles', {
-      p_fecha: fechaStr,
-      p_duracion_minutos: state.servicio.duracion_minutos,
+    const { data } = await sb.rpc('get_slots_disponibles', {
+      p_fecha: R.fecha.toISOString().split('T')[0],
+      p_duracion_minutos: R.servicio.duracion_minutos,
     });
-
-    loading.style.display = 'none';
-
-    if (error || !data?.length) {
-      grid.innerHTML = '<p style="grid-column:span 3;text-align:center;color:var(--text-muted);font-size:12px;padding:16px">No hay horarios disponibles para este día.</p>';
+    hint.style.display = 'none';
+    if (!data?.length) {
+      grid.innerHTML = '<p style="grid-column:span 3;text-align:center;color:var(--muted);font-size:12px;padding:16px">Sin horarios disponibles para este día.</p>';
       return;
     }
-
-    grid.innerHTML = data.map(slot => {
-      const hora = new Date(slot.slot_inicio).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: false });
-      return `<div class="slot" onclick="seleccionarSlot('${hora}', this)">${hora}</div>`;
+    grid.innerHTML = data.map(s => {
+      const h = new Date(s.slot_inicio).toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit', hour12:false });
+      return `<div class="slot" onclick="selSlot('${h}',this)">${h}</div>`;
     }).join('');
-
-  } catch (e) {
-    // Fallback: slots genéricos si no hay conexión con la función RPC
-    loading.style.display = 'none';
-    const slots = generarSlotsGenericos();
-    grid.innerHTML = slots.map(h =>
-      `<div class="slot" onclick="seleccionarSlot('${h}', this)">${h}</div>`
-    ).join('');
+  } catch {
+    hint.style.display = 'none';
+    // Fallback genérico
+    const slots = [];
+    for (let h = 9; h < 18; h++) { slots.push(`${String(h).padStart(2,'0')}:00`); if(h<17) slots.push(`${String(h).padStart(2,'0')}:30`); }
+    grid.innerHTML = slots.map(h => `<div class="slot" onclick="selSlot('${h}',this)">${h}</div>`).join('');
   }
 }
 
-function generarSlotsGenericos() {
-  const slots = [];
-  for (let h = 9; h < 18; h++) {
-    slots.push(`${String(h).padStart(2,'0')}:00`);
-    if (h < 17) slots.push(`${String(h).padStart(2,'0')}:30`);
-  }
-  return slots;
+function selSlot(hora, el) {
+  if (el.classList.contains('ocup')) return;
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('sel'));
+  el.classList.add('sel');
+  R.slot = hora;
 }
 
-function seleccionarSlot(hora, el) {
-  if (el.classList.contains('ocupado')) return;
-  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
-  el.classList.add('selected');
-  state.slot = hora;
-}
-
-function irAConfirmar() {
-  if (!state.fecha) return showAlert('alert-fecha', 'Seleccioná un día.');
-  if (!state.slot) return showAlert('alert-fecha', 'Seleccioná un horario.');
+function r_paso3() {
+  if (!R.fecha) return showAlert('al-fecha', 'Seleccioná un día.');
+  if (!R.slot)  return showAlert('al-fecha', 'Seleccioná un horario.');
   renderResumen();
-  irA('screen-confirmar');
+  irA('s-confirmar', 's-fecha');
 }
 
-// ================================================
-// PASO 4: RESUMEN Y CONFIRMACIÓN
-// ================================================
+// ════════════════════════════════════════════
+// RESERVAR — PASO 4: CONFIRMAR
+// ════════════════════════════════════════════
 function renderResumen() {
-  const fechaStr = state.fecha.toLocaleDateString('es', {
-    weekday: 'long', day: 'numeric', month: 'long'
-  });
-
-  const html = `
-    <div class="resumen-item">
-      <div class="resumen-icon">👤</div>
-      <div><div class="resumen-label">Cliente</div><div class="resumen-val">${state.nombre}</div></div>
-    </div>
-    <div class="resumen-item">
-      <div class="resumen-icon">✨</div>
-      <div><div class="resumen-label">Servicio</div><div class="resumen-val">${state.servicio.nombre}</div></div>
-    </div>
-    <div class="resumen-item">
-      <div class="resumen-icon">📅</div>
-      <div><div class="resumen-label">Fecha</div><div class="resumen-val" style="text-transform:capitalize">${fechaStr}</div></div>
-    </div>
-    <div class="resumen-item">
-      <div class="resumen-icon">⏰</div>
-      <div><div class="resumen-label">Hora</div><div class="resumen-val">${state.slot} hs</div></div>
-    </div>
-    <div class="resumen-item">
-      <div class="resumen-icon">💰</div>
-      <div><div class="resumen-label">Precio</div><div class="resumen-val" style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700">$${Number(state.servicio.precio).toLocaleString('es')}</div></div>
-    </div>
-  `;
-
-  document.getElementById('resumen-container').innerHTML = html;
+  const fd = R.fecha.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' });
+  document.getElementById('res-wrap').innerHTML = `
+    <div class="res-item"><div class="res-icon">👤</div>
+      <div><div class="res-lbl">Cliente</div><div class="res-val">${R.nombre}</div></div></div>
+    <div class="res-item"><div class="res-icon">✨</div>
+      <div><div class="res-lbl">Servicio</div><div class="res-val">${R.servicio.nombre}</div></div></div>
+    <div class="res-item"><div class="res-icon">📅</div>
+      <div><div class="res-lbl">Fecha</div><div class="res-val" style="text-transform:capitalize">${fd}</div></div></div>
+    <div class="res-item"><div class="res-icon">⏰</div>
+      <div><div class="res-lbl">Hora</div><div class="res-val">${R.slot} hs</div></div></div>
+    <div class="res-item"><div class="res-icon">💰</div>
+      <div><div class="res-lbl">Precio</div>
+        <div class="res-val" style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700">${ars(R.servicio.precio)}</div>
+      </div></div>`;
 }
 
-async function confirmarCita() {
-  const btn = document.getElementById('btn-confirmar');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Confirmando...';
+async function r_confirmar() {
+  const btn = document.getElementById('btn-conf');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Confirmando...';
 
-  const notas = document.getElementById('input-notas').value.trim();
-  state.notas = notas;
-
-  // Construir fecha+hora combinadas
-  const [hh, mm] = state.slot.split(':');
-  const fechaHora = new Date(state.fecha);
-  fechaHora.setHours(parseInt(hh), parseInt(mm), 0, 0);
+  const notas = document.getElementById('r-notas').value.trim();
+  const [hh, mm] = R.slot.split(':');
+  const fh = new Date(R.fecha); fh.setHours(+hh, +mm, 0, 0);
 
   try {
     const { data, error } = await sb.from('citas').insert({
-      cliente_id: state.clienteId,
-      servicio_id: state.servicio.id,
-      servicio_nombre: state.servicio.nombre,
-      servicio_precio: state.servicio.precio,
-      servicio_duracion: state.servicio.duracion_minutos,
-      fecha_hora: fechaHora.toISOString(),
-      estado: 'pendiente',
-      origen: 'web',
+      cliente_id: R.clienteId, servicio_id: R.servicio.id,
+      servicio_nombre: R.servicio.nombre, servicio_precio: R.servicio.precio,
+      servicio_duracion: R.servicio.duracion_minutos,
+      fecha_hora: fh.toISOString(), estado: 'pendiente', origen: 'web',
       notas: notas || null,
     }).select().single();
-
     if (error) throw error;
 
-    // Encolar notificación WhatsApp
+    // Sumar puntos (10 pts por cada $1000)
+    const pts = Math.floor(R.servicio.precio / 1000) * 10;
+    if (pts > 0) {
+      await sb.from('movimientos_puntos').insert({
+        cliente_id: R.clienteId, puntos: pts, cita_id: data.id,
+        motivo: `Reserva: ${R.servicio.nombre}`,
+      });
+    }
+
+    // Notificación WhatsApp en cola
     await sb.from('notificaciones_whatsapp').insert({
-      cliente_id: state.clienteId,
-      cita_id: data.id,
-      tipo: 'confirmacion_cita',
-      mensaje: generarMensajeConfirmacion(),
-      telefono_destino: state.telefono,
-      estado: 'pendiente',
+      cliente_id: R.clienteId, cita_id: data.id, tipo: 'confirmacion_cita',
+      mensaje: msgConfirmacion(fh),
+      telefono_destino: R.tel, estado: 'pendiente',
     });
 
-    mostrarExito();
-
-  } catch (e) {
-    console.error(e);
-    showAlert('alert-confirmar', 'Hubo un error al confirmar. Intentá de nuevo.');
-    btn.disabled = false;
-    btn.innerHTML = 'Confirmar cita';
+    mostrarExito(fh, pts);
+  } catch(e) {
+    showAlert('al-conf', 'Error al confirmar. Intentá de nuevo.');
+    btn.disabled = false; btn.innerHTML = 'Confirmar cita';
   }
 }
 
-function generarMensajeConfirmacion() {
-  const fechaStr = state.fecha.toLocaleDateString('es', {
-    weekday: 'long', day: 'numeric', month: 'long'
-  });
-  return `¡Hola ${state.nombre}! 🌿 Tu cita en Lash Cataleya ha sido registrada exitosamente.\n\n✨ Servicio: ${state.servicio.nombre}\n📅 Fecha: ${fechaStr}\n⏰ Hora: ${state.slot} hs\n💰 Precio: $${Number(state.servicio.precio).toLocaleString('es')}\n\nTe confirmaremos la cita a la brevedad. ¡Gracias por elegirnos!`;
+function msgConfirmacion(fh) {
+  const fd = fh.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' });
+  const hora = `${String(fh.getHours()).padStart(2,'0')}:${String(fh.getMinutes()).padStart(2,'0')}`;
+  return `✨ ¡Hola ${R.nombre}!\n\nTu cita en Lash Cataleya fue registrada.\n\n📋 Servicio: ${R.servicio.nombre}\n📅 Fecha: ${fd}\n⏰ Hora: ${hora} hs\n💰 Precio: ${ars(R.servicio.precio)}\n\nTe confirmamos a la brevedad 💚`;
 }
 
-function mostrarExito() {
-  const fechaStr = state.fecha.toLocaleDateString('es', {
-    weekday: 'long', day: 'numeric', month: 'long'
-  });
-
-  document.getElementById('exito-texto').textContent =
-    `Tu solicitud fue enviada. Recibirás una confirmación por WhatsApp en breve.`;
-
-  document.getElementById('resumen-exito').innerHTML = `
-    <div class="resumen-item">
-      <div class="resumen-icon">✨</div>
-      <div><div class="resumen-label">Servicio</div><div class="resumen-val">${state.servicio.nombre}</div></div>
-    </div>
-    <div class="resumen-item">
-      <div class="resumen-icon">📅</div>
-      <div><div class="resumen-label">Fecha</div><div class="resumen-val" style="text-transform:capitalize">${fechaStr} · ${state.slot} hs</div></div>
-    </div>
-  `;
-
-  // Link de WhatsApp con mensaje pre-armado
-  const msg = encodeURIComponent(generarMensajeConfirmacion());
-  document.getElementById('btn-whatsapp').href =
-    `https://wa.me/${WHATSAPP_NEGOCIO.replace(/\D/g,'')}?text=${msg}`;
-
-  irA('screen-exito');
+function mostrarExito(fh, pts) {
+  const fd = fh.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' });
+  document.getElementById('ex-texto').textContent =
+    pts > 0
+      ? `¡Cita registrada! Sumaste ${pts} puntos de lealtad 🌿`
+      : 'Tu solicitud fue enviada. Te confirmamos a la brevedad.';
+  document.getElementById('ex-res').innerHTML = `
+    <div class="res-item"><div class="res-icon">✨</div>
+      <div><div class="res-lbl">Servicio</div><div class="res-val">${R.servicio.nombre}</div></div></div>
+    <div class="res-item"><div class="res-icon">📅</div>
+      <div><div class="res-lbl">Fecha y hora</div>
+        <div class="res-val" style="text-transform:capitalize">${fd} · ${R.slot} hs</div></div></div>`;
+  const msg = encodeURIComponent(msgConfirmacion(fh));
+  document.getElementById('ex-wa').href = `https://wa.me/${WA_NEGOCIO.replace(/\D/g,'')}?text=${msg}`;
+  irA('s-exito', 's-confirmar');
 }
 
 function nuevaReserva() {
-  // Reset estado
-  Object.assign(state, {
-    nombre:'', telefono:'', email:'',
-    clienteId: null, servicio: null,
-    fecha: null, slot: null, notas: '',
-  });
-  document.getElementById('input-nombre').value = '';
-  document.getElementById('input-telefono').value = '';
-  document.getElementById('input-email').value = '';
-  document.getElementById('input-notas').value = '';
-  calMes = new Date().getMonth();
-  calAnio = new Date().getFullYear();
-  irA('screen-cliente');
+  Object.assign(R, { nombre:'', tel:'', email:'', clienteId:null, servicio:null, fecha:null, slot:null });
+  ['r-nombre','r-tel','r-email','r-notas'].forEach(id => document.getElementById(id).value = '');
+  calM = new Date().getMonth(); calY = new Date().getFullYear();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-datos').classList.add('active');
+  window.scrollTo({ top:0, behavior:'smooth' });
 }
+
+// ════════════════════════════════════════════
+// PORTAL — LOGIN
+// ════════════════════════════════════════════
+function pinNext(i) {
+  const v = document.getElementById(`pin${i}`).value;
+  if (v && i < 3) document.getElementById(`pin${i+1}`).focus();
+}
+
+function getPin() {
+  return [0,1,2,3].map(i => document.getElementById(`pin${i}`).value).join('');
+}
+
+async function p_login() {
+  const tel = document.getElementById('p-tel').value.trim();
+  const pin = getPin();
+  if (!tel)      return showAlert('al-login', 'Ingresá tu WhatsApp.');
+  if (pin.length < 4) return showAlert('al-login', 'Ingresá tu PIN de 4 dígitos.');
+
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true; btn.textContent = 'Verificando...';
+
+  try {
+    const { data, error } = await sb.from('clientes').select('id,nombre,telefono,puntos,pin')
+      .eq('telefono', tel).maybeSingle();
+
+    if (error || !data) {
+      showAlert('al-login', 'No encontramos una cuenta con ese número.');
+      btn.disabled = false; btn.textContent = 'Ingresar';
+      return;
+    }
+
+    if (!data.pin) {
+      showAlert('al-login', 'Aún no tenés PIN. Solicitá uno con el botón de abajo.');
+      btn.disabled = false; btn.textContent = 'Ingresar';
+      return;
+    }
+
+    if (data.pin !== pin) {
+      showAlert('al-login', 'PIN incorrecto. Verificá e intentá de nuevo.');
+      [0,1,2,3].forEach(i => document.getElementById(`pin${i}`).value = '');
+      document.getElementById('pin0').focus();
+      btn.disabled = false; btn.textContent = 'Ingresar';
+      return;
+    }
+
+    // Login OK
+    P.clienteId = data.id;
+    P.nombre    = data.nombre;
+    P.tel       = data.telefono;
+    P.puntos    = data.puntos || 0;
+
+    btn.disabled = false; btn.textContent = 'Ingresar';
+    document.getElementById('bienvenida').textContent = `Hola, ${P.nombre.split(' ')[0]} 👋`;
+    document.getElementById('bottom-nav').classList.add('show');
+
+    irA('p-home', 'p-login');
+    cargarPortal();
+  } catch(e) {
+    showAlert('al-login', 'Error de conexión.');
+    btn.disabled = false; btn.textContent = 'Ingresar';
+  }
+}
+
+function p_solicitarPin() {
+  const card = document.getElementById('solicitar-pin-card');
+  card.style.display = card.style.display === 'none' ? 'block' : 'none';
+}
+
+async function solicitarPin() {
+  const tel = document.getElementById('sol-tel').value.trim();
+  if (!tel) return showAlert('al-sol', 'Ingresá tu WhatsApp.');
+
+  // Verificar que el cliente existe
+  const { data } = await sb.from('clientes').select('id,nombre').eq('telefono', tel).maybeSingle();
+  if (!data) {
+    showAlert('al-sol', 'No encontramos una cuenta con ese número. Hacé una reserva primero.');
+    return;
+  }
+
+  // Generar PIN aleatorio
+  const pin = String(Math.floor(1000 + Math.random() * 9000));
+
+  // Guardar PIN en Supabase
+  await sb.from('clientes').update({ pin }).eq('id', data.id);
+
+  // Encolar notificación WhatsApp con el PIN
+  await sb.from('notificaciones_whatsapp').insert({
+    cliente_id: data.id, tipo: 'personalizado',
+    mensaje: `Hola ${data.nombre.split(' ')[0]} 🌿\n\nTu PIN de acceso a Lash Cataleya es: *${pin}*\n\nUsalo en nuestra web para ver tus citas, historial y puntos 💚`,
+    telefono_destino: tel, estado: 'pendiente',
+  });
+
+  showAlert('al-sol-ok', `¡PIN enviado por WhatsApp al ${tel}! Puede demorar unos minutos.`, 'ok');
+  showAlert('al-sol', '', 'err');
+  document.getElementById('solicitar-pin-card').style.display = 'none';
+}
+
+function p_logout() {
+  Object.assign(P, { clienteId:null, nombre:'', tel:'', puntos:0 });
+  document.getElementById('bottom-nav').classList.remove('show');
+  [0,1,2,3].forEach(i => document.getElementById(`pin${i}`).value = '');
+  document.getElementById('p-tel').value = '';
+  irA('p-login', 'p-home');
+}
+
+// ════════════════════════════════════════════
+// PORTAL — CARGAR DATOS
+// ════════════════════════════════════════════
+async function cargarPortal() {
+  await Promise.all([ cargarCitasPortal(), cargarHistorialPortal(), cargarLealtad() ]);
+}
+
+async function cargarCitasPortal() {
+  const list = document.getElementById('pt-citas-list');
+  const ahora = new Date().toISOString();
+
+  const { data } = await sb.from('citas').select()
+    .eq('cliente_id', P.clienteId)
+    .gte('fecha_hora', ahora)
+    .not('estado', 'in', '("cancelada","no_asistio")')
+    .order('fecha_hora').limit(10);
+
+  if (!data?.length) {
+    list.innerHTML = `<div class="empty"><div class="ei">📅</div><p>No tenés citas próximas.<br>¡Reservá tu turno!</p></div>`;
+    return;
+  }
+
+  list.innerHTML = data.map(c => citaCardHTML(c, true)).join('');
+}
+
+async function cargarHistorialPortal() {
+  const list = document.getElementById('pt-hist-list');
+  const ahora = new Date().toISOString();
+
+  const { data } = await sb.from('citas').select()
+    .eq('cliente_id', P.clienteId)
+    .lt('fecha_hora', ahora)
+    .order('fecha_hora', { ascending: false }).limit(20);
+
+  if (!data?.length) {
+    list.innerHTML = `<div class="empty"><div class="ei">📋</div><p>Aún no tenés historial de citas.</p></div>`;
+    return;
+  }
+
+  list.innerHTML = data.map(c => {
+    const fd = new Date(c.fecha_hora).toLocaleDateString('es-AR', { day:'numeric', month:'short', year:'numeric' });
+    const badgeCls = c.estado === 'completada' ? 'badge-green' : c.estado === 'cancelada' ? 'badge-red' : 'badge-gray';
+    const estadoLabel = { completada:'Completada', cancelada:'Cancelada', pendiente:'Pendiente', confirmada:'Confirmada', no_asistio:'No asistió' }[c.estado] || c.estado;
+    return `
+      <div class="hist-item">
+        <div class="hist-dot" style="background:var(--sv)">✨</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:13px">${c.servicio_nombre}</div>
+          <div style="font-size:11px;color:var(--muted)">${fd}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700">${ars(c.servicio_precio)}</div>
+          <span class="badge ${badgeCls}" style="margin-top:4px">${estadoLabel}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function cargarLealtad() {
+  const wrap = document.getElementById('pt-leal-content');
+
+  // Recargar puntos actuales
+  const { data: cl } = await sb.from('clientes').select('puntos').eq('id', P.clienteId).single();
+  P.puntos = cl?.puntos || 0;
+
+  // Movimientos
+  const { data: movs } = await sb.from('movimientos_puntos').select()
+    .eq('cliente_id', P.clienteId).order('created_at', { ascending: false }).limit(10);
+
+  const nivel = P.puntos >= 800 ? 'Oro ✨' : P.puntos >= 400 ? 'Plata 🥈' : 'Bronce 🥉';
+  const nivelColor = P.puntos >= 800 ? '#D4A017' : P.puntos >= 400 ? '#59789F' : '#CD7F32';
+  const sigNivel = P.puntos < 400 ? 400 : 800;
+  const prog = Math.min(P.puntos / sigNivel * 100, 100).toFixed(0);
+  const faltante = Math.max(sigNivel - P.puntos, 0);
+
+  const RECOMPENSAS = [
+    { pts:200, desc:'10% de descuento en tu próxima cita',     emoji:'🏷️' },
+    { pts:350, desc:'Retoque gratis de clásicas',               emoji:'✨' },
+    { pts:500, desc:'1 servicio gratis (hasta $80.000)',         emoji:'🎁' },
+    { pts:800, desc:'Servicio premium gratis (hasta $150.000)', emoji:'⭐' },
+  ];
+
+  wrap.innerHTML = `
+    <!-- Card de puntos -->
+    <div class="card" style="background:linear-gradient(135deg,${nivelColor},${nivelColor}99);border:none">
+      <div style="color:rgba(255,255,255,.7);font-size:11px;font-weight:600;margin-bottom:4px">PROGRAMA DE LEALTAD</div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between">
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:700;color:#fff;line-height:1">${P.puntos}</div>
+          <div style="color:rgba(255,255,255,.7);font-size:12px">puntos acumulados</div>
+        </div>
+        <div style="text-align:right">
+          <div style="background:rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;color:#fff;font-size:12px;font-weight:700">${nivel}</div>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.7);margin-bottom:6px">
+          <span>Progreso al siguiente nivel</span>
+          <span>${P.puntos} / ${sigNivel}</span>
+        </div>
+        <div class="pts-bar"><div class="pts-fill" style="width:${prog}%"></div></div>
+        <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:4px">
+          ${faltante > 0 ? `Faltan ${faltante} puntos` : '¡Nivel máximo! 🎉'}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recompensas -->
+    <div class="card">
+      <p class="card-title" style="font-size:16px">Recompensas</p>
+      <p class="card-sub">Acumulá puntos en cada visita</p>
+      ${RECOMPENSAS.map(r => {
+        const ok = P.puntos >= r.pts;
+        return `<div class="reward ${ok?'ok':''}">
+          <div class="reward-icon" style="background:${ok?'rgba(122,148,69,.12)':'var(--sv)'}">${r.emoji}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:${ok?'var(--text)':'var(--muted)'}">${r.desc}</div>
+            <div style="font-size:11px;font-weight:700;color:${ok?'var(--moss)':'var(--muted)'};margin-top:3px">${r.pts} puntos</div>
+          </div>
+          ${ok
+            ? `<span class="badge badge-green">¡Disponible!</span>`
+            : `<span style="font-size:10px;color:var(--muted)">Faltan ${r.pts - P.puntos}</span>`}
+        </div>`;
+      }).join('')}
+      <div style="margin-top:12px;padding:12px;background:var(--sv);border-radius:10px;font-size:11px;color:var(--muted)">
+        💡 Ganás <strong>10 puntos</strong> por cada $1.000 en servicios. Para canjear una recompensa, mencionalo en tu próxima visita.
+      </div>
+    </div>
+
+    <!-- Historial de puntos -->
+    <div class="card">
+      <p class="card-title" style="font-size:16px">Historial de puntos</p>
+      ${!movs?.length
+        ? '<div class="empty" style="padding:20px 0"><div class="ei">⭐</div><p>Aún no tenés movimientos de puntos.</p></div>'
+        : movs.map(m => {
+            const pts = m.puntos;
+            const pos = pts > 0;
+            const fd  = new Date(m.created_at).toLocaleDateString('es-AR', { day:'numeric', month:'short' });
+            return `<div class="hist-item">
+              <div class="hist-dot" style="background:${pos?'rgba(122,148,69,.1)':'rgba(184,92,92,.1)'}">
+                ${pos ? '➕' : '➖'}
+              </div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600">${m.motivo || 'Movimiento'}</div>
+                <div style="font-size:10px;color:var(--muted)">${fd}</div>
+              </div>
+              <div style="font-weight:700;font-size:14px;color:${pos?'var(--moss)':'var(--error)'}">
+                ${pos?'+':''}${pts} pts
+              </div>
+            </div>`;
+          }).join('')}
+    </div>
+
+    <div style="height:80px"></div>
+  `;
+}
+
+// ════════════════════════════════════════════
+// PORTAL — CITA CARD con opción de cancelar
+// ════════════════════════════════════════════
+function citaCardHTML(c, permitirCancelar) {
+  const fh    = new Date(c.fecha_hora);
+  const fd    = fh.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long' });
+  const hora  = `${String(fh.getHours()).padStart(2,'0')}:${String(fh.getMinutes()).padStart(2,'0')}`;
+  const hoy   = new Date();
+  const diff  = Math.floor((fh - hoy) / 86400000);
+  const puedeCancel = permitirCancelar && c.estado !== 'cancelada' && diff > 0;
+
+  const barColor = { pendiente:'#D4A017', confirmada:'#7A9445', completada:'#59789F',
+    cancelada:'#B85C5C', no_asistio:'#8A9E8E' }[c.estado] || '#ccc';
+  const badgeCls = { pendiente:'badge-warn', confirmada:'badge-green', completada:'badge-blue',
+    cancelada:'badge-red', no_asistio:'badge-gray' }[c.estado] || 'badge-gray';
+  const eL = { pendiente:'Pendiente', confirmada:'Confirmada', completada:'Completada',
+    cancelada:'Cancelada', no_asistio:'No asistió' }[c.estado] || c.estado;
+
+  return `
+    <div class="cita-card">
+      <div class="bar" style="background:${barColor}"></div>
+      <div class="cita-card-inner">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <div style="font-weight:700;font-size:14px">${c.servicio_nombre}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;text-transform:capitalize">${fd} · ${hora} hs</div>
+          </div>
+          <span class="badge ${badgeCls}">${eL}</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700">${ars(c.servicio_precio)}</div>
+          ${puedeCancel
+            ? `<button class="btn btn-danger btn-sm" onclick="abrirCancelModal('${c.id}','${c.servicio_nombre}','${fd}','${hora}')">
+                Cancelar
+               </button>`
+            : ''}
+        </div>
+        ${diff === 0 ? '<div style="margin-top:8px;padding:8px 10px;background:rgba(122,148,69,.1);border-radius:8px;font-size:11px;font-weight:600;color:var(--moss)">¡Tu cita es HOY! 🌿</div>' : ''}
+        ${diff === 1 ? '<div style="margin-top:8px;padding:8px 10px;background:rgba(212,160,23,.1);border-radius:8px;font-size:11px;font-weight:600;color:var(--warn)">Tu cita es mañana ⏰</div>' : ''}
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════
+// PORTAL — CANCELAR CITA
+// ════════════════════════════════════════════
+function abrirCancelModal(citaId, servicio, fecha, hora) {
+  citaACancelar = citaId;
+  document.getElementById('modal-cancel-txt').textContent =
+    `¿Seguro que querés cancelar tu cita de ${servicio} el ${fecha} a las ${hora} hs?`;
+  document.getElementById('modal-cancel').classList.add('show');
+}
+
+function cerrarModal() {
+  document.getElementById('modal-cancel').classList.remove('show');
+  citaACancelar = null;
+}
+
+async function confirmarCancelacion() {
+  if (!citaACancelar) return;
+  const btn = document.getElementById('modal-cancel-btn');
+  btn.disabled = true; btn.textContent = 'Cancelando...';
+
+  try {
+    await sb.from('citas').update({ estado: 'cancelada' }).eq('id', citaACancelar);
+    cerrarModal();
+    await cargarCitasPortal();
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Sí, cancelar mi cita';
+  }
+}
+
+// ════════════════════════════════════════════
+// PORTAL — TABS
+// ════════════════════════════════════════════
+function pTab(btn, tabId) {
+  document.querySelectorAll('.portal-tab').forEach(b => b.classList.remove('act'));
+  document.querySelectorAll('.portal-section').forEach(s => s.style.display = 'none');
+  btn.classList.add('act');
+  document.getElementById(tabId).style.display = 'block';
+}
+
+function pTab2(tabId, btn) {
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('act'));
+  btn.classList.add('act');
+  // Sincronizar con tabs del portal
+  const map = { 'pt-citas':0, 'pt-hist':1, 'pt-leal':2 };
+  const tabs = document.querySelectorAll('.portal-tab');
+  tabs.forEach(t => t.classList.remove('act'));
+  tabs[map[tabId]]?.classList.add('act');
+  document.querySelectorAll('.portal-section').forEach(s => s.style.display = 'none');
+  document.getElementById(tabId).style.display = 'block';
+}
+
+// ════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════
+function ars(v) {
+  return new Intl.NumberFormat('es-AR', { style:'currency', currency:'ARS', maximumFractionDigits:0 }).format(v);
+}
+
+// Cerrar modal al tocar el fondo
+document.getElementById('modal-cancel').addEventListener('click', function(e) {
+  if (e.target === this) cerrarModal();
+});
 </script>
 </body>
 </html>
